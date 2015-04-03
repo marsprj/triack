@@ -25,6 +25,8 @@ namespace radi
 		bool		PutTile(const char* t_key, const unsigned char* t_data, size_t size, const char* content_type);
 		bool		PutTile(const char* t_key, const char* t_path);
 
+		bool		DeleteTile(const char* t_key);
+
 		const char* GetGeoMeta();
 		const char* GetConfXML();
 		const char* GetConfCDI();

@@ -13,6 +13,8 @@ void RiakFSTest::setUp()
 	//m_riak.SetServer("192.168.111.104");
 	//m_riak.SetServer("192.168.111.151");
 	//m_riak.SetPort(8087);
+	
+	// 连接Riack
 	if (!m_riak.Connect())
 	{
 		printf("connect fail\n");
@@ -21,12 +23,14 @@ void RiakFSTest::setUp()
 
 void RiakFSTest::tearDown()
 {
+	// 关闭连接
 	m_riak.Close();
 	printf("tearDown\n");
 }
 
 void RiakFSTest::GetRoot()
 {
+	// 获取RiakFS文件系统根目录
 	radi::RiakFile* rf = m_riak.GetRoot();
 	CPPUNIT_ASSERT(rf != NULL);
 
@@ -38,9 +42,11 @@ void RiakFSTest::GetFolders()
 	radi::RiakFile* rf = m_riak.GetRoot();
 	CPPUNIT_ASSERT(rf != NULL);
 	
+	// 列出根节点下面的子目录
 	radi::RiakFileSet* files = rf->GetFiles();
 	CPPUNIT_ASSERT(files != NULL);
 
+	// 显示目录的名称和key
 	int count = files->GetCount();
 	for (int i = 0; i < count; i++)
 	{
@@ -61,12 +67,15 @@ void RiakFSTest::GetTestKeys()
 	radi::RiakFile* tf = root->GetRiakFile("test");
 	CPPUNIT_ASSERT(tf != NULL);
 
+	// 根据名称获取tar包的File
 	radi::RiakFile* rf = tf->GetRiakFile("wgs84_vector_2to9_Layers");
 	CPPUNIT_ASSERT(rf != NULL);
 
+	// 每个tar包含有一个TileStore
 	radi::RiakTileStore* store = rf->GetTileStore();
 	//store->GetTiles();
 
+	// 根据Key从tilestore中获取tile
 	radi::RiakTile* tile = store->GetTile("2x1x2");
 	tile->Save("g:\\temp\\riack\\tile.png");
 
@@ -80,12 +89,15 @@ void RiakFSTest::CreateFolder()
 {
 	radi::RiakFile* root = m_riak.GetRoot();
 	CPPUNIT_ASSERT(root != NULL);
-
+	//创建目录
 	root->CreateRiakFolder("test2");
 
 	root->Release();
 }
 
+/*
+ * RiakFS中的文件和目录都使用RiakFile类。对于文件类型的RiakFile，可以过去一个RiakTileStore对象，该对象管理tile。
+ */
 void RiakFSTest::GetGeoMeta()
 {
 	radi::RiakFile* root = m_riak.GetRoot();
@@ -95,7 +107,7 @@ void RiakFSTest::GetGeoMeta()
 	CPPUNIT_ASSERT(rf != NULL);
 
 	radi::RiakTileStore* store = rf->GetTileStore();
-
+	//获取tilestore的配置文件
 	const char* meta = store->GetGeoMeta();
 	printf(meta);
 
@@ -133,6 +145,24 @@ void RiakFSTest::PutTile()
 		store->PutTile(key, path);
 	}
 	
+
+	//store->Release();
+	rf->Release();
+	root->Release();
+}
+
+void RiakFSTest::PutCDI()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	CPPUNIT_ASSERT(root != NULL);
+
+	radi::RiakFile* rf = root->GetRiakFile("world_bbb");
+	CPPUNIT_ASSERT(rf != NULL);
+
+	radi::RiakTileStore* store = rf->GetTileStore();
+
+	//写入CDI文件
+	store->PutConfCDI("<?xml  version=\"1.0\"  encoding=\"UTF-8\"?><CacheInfo  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"  xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.1\"  xsi:type=\"typens:CacheInfo\">    </CacheInfo>");
 
 	//store->Release();
 	rf->Release();

@@ -322,4 +322,19 @@ namespace radi
 		return PutTile(RADI_CONF_CDI_KEY, (unsigned char*)data, strlen(data), "text/plain");
 	}
 
+	bool RiakTileStore::DeleteTile(const char* t_key)
+	{
+		if (!t_key)
+		{
+			return false;
+		}
+
+		riack_client* client = m_riak_fs->GetConnection();
+
+		int ret = riack_delete(client, m_key.c_str(), t_key, NULL);
+
+
+		return (ret==RIACK_SUCCESS);
+	}
+
 }
