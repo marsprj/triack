@@ -3,6 +3,7 @@
 #include "RiakFile.h"
 #include "RiakFileSet.h"
 #include "RiakTileStore.h"
+#include "RiakTileStoreSet.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION(RiakFSTest);
 
@@ -167,4 +168,31 @@ void RiakFSTest::PutCDI()
 	//store->Release();
 	rf->Release();
 	root->Release();
+}
+
+void RiakFSTest::CreateTileStore()
+{
+	char uuid[RADI_PATH_MAX];
+	memset(uuid, 0, RADI_PATH_MAX);
+	radi::radi_uuid_generate(uuid, RADI_PATH_MAX);
+
+	radi::RiakTileStore* store = m_riak.CreateTileStore(uuid, radi::radiTileStorePIGS);
+	store->PutGeoMeta("<aa></aa>");
+	store->PutGeoMeta("<bb></bb>");
+	store->PutConfCDI("<cc></cc>");
+
+	store->Release();
+}
+
+void RiakFSTest::ListTileStore()
+{
+	radi::RiakTileStore* store = NULL;
+	radi::RiakTileStoreSet* stores = m_riak.GetTileStores();
+	stores->Reset();
+	while ((store = stores->Next()) != NULL)
+	{
+		printf("%s\n", store->GetKey());
+	}
+
+	stores->Release();
 }

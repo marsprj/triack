@@ -41,8 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>../include;E:\DevEnv\riack\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\DevEnv\riack\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\depends\riack\include;../include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\depends\riack\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)D</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -90,6 +90,7 @@ copy $(OutDir)\$(TargetName).lib ..\..\lib
     <ClCompile Include="..\src\RiakFS.cpp" />
     <ClCompile Include="..\src\RiakTile.cpp" />
     <ClCompile Include="..\src\RiakTileStore.cpp" />
+    <ClCompile Include="..\src\RiakTileStoreSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\RiakFile.h" />
@@ -97,6 +98,7 @@ copy $(OutDir)\$(TargetName).lib ..\..\lib
     <ClInclude Include="..\include\RiakFS.h" />
     <ClInclude Include="..\include\RiakTile.h" />
     <ClInclude Include="..\include\RiakTileStore.h" />
+    <ClInclude Include="..\include\RiakTileStoreSet.h" />
     <ClInclude Include="..\include\triack.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

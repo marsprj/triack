@@ -2,6 +2,7 @@
 #include "RiakFile.h"
 #include "RiakFileSet.h"
 #include "RiakTileStore.h"
+#include "RiakTileStoreSet.h"
 #include "stdlib.h"
 
 #ifdef WIN32
@@ -43,7 +44,7 @@ namespace radi
 #endif
 	}
 
-	void griak_uuid_generate(char* uuid, size_t size)
+	void radi_uuid_generate(char* uuid, size_t size)
 	{
 #ifdef WIN32
 		uuid_t uu;
@@ -257,7 +258,7 @@ namespace radi
 
 		RiakFile* rf = NULL;
 		riack_content& r_content = robj->object.content[0];
-		
+
 		char key[RADI_PATH_MAX];
 		int n_links = r_content.link_count;
 		for (int i = 0; i < n_links; i++)
@@ -363,7 +364,7 @@ namespace radi
 
 		bool ret = false;
 		char f_key[RADI_PATH_MAX];
-		griak_uuid_generate(f_key, RADI_PATH_MAX);
+		radi_uuid_generate(f_key, RADI_PATH_MAX);
 		if (is_folder)
 		{
 			ret = CreateRiakFileObj(f_name, f_key, parent_key, data_type);
@@ -372,11 +373,11 @@ namespace radi
 		{
 
 		}
-		
+
 		if (!ret)
 		{
 			pf->Release();
-			
+
 			return NULL;
 		}
 
@@ -392,7 +393,7 @@ namespace radi
 		const char* type = "text/plain";
 		riack_client* client = GetConnection();
 		riack_object* robj = riack_object_alloc(m_riak);
-		
+
 		// file property
 		robj->bucket.value = (char*)m_fs_name.c_str();
 		robj->bucket.len = m_fs_name.length();
@@ -497,5 +498,95 @@ namespace radi
 		riack_free_object_p(m_riak, &robj);
 
 		return (result == RIACK_SUCCESS);
+	}
+
+	RiakTileStore* RiakFS::CreateTileStore(const char* name, TileStoreType type)
+	{
+		RiakTileStore* store = NULL;
+		switch (type)
+		{
+		case radiTileStorePIGS:
+			store = CreateTileStorePGS(name);
+			break;
+		default:
+			break;
+		}
+		return store;
+	}
+
+	RiakTileStore* RiakFS::CreateTileStorePGS(const char* name)
+	{
+		RiakTileStore* store = NULL;
+		if (HasBucket(name))
+		{
+			return NULL;
+		}
+
+		return store;
+	}
+
+	bool RiakFS::HasBucket(const char* name)
+	{
+		bool has = false;
+
+		riack_string_list* bucket_list;
+		riack_list_buckets(m_riak, &bucket_list);
+
+		char temp[_MAX_PATH];
+		for (int i = 0; i < bucket_list->string_count; i++)
+		{
+			riack_string& str = bucket_list->strings[i];
+			if (!strncmp(name, str.value, str.len))
+			{
+				has = true;
+				break;
+			}
+		}
+
+		riack_free_string_list_p(m_riak, &bucket_list);
+
+		return has;
+	}
+
+	RiakTileStore* RiakFS::GetTileStore(const char* name)
+	{
+		if (name == NULL)
+		{
+			return NULL;
+		}
+
+		if (!HasBucket(name))
+		{
+			return NULL;
+		}
+
+		RiakTileStore* store = new RiakTileStore("", name, this);
+		return store;
+	}
+
+	RiakTileStoreSet* RiakFS::GetTileStores()
+	{
+		RiakTileStoreSet* pset = new RiakTileStoreSet();
+		
+		riack_string_list* bucket_list;
+		riack_list_buckets(m_riak, &bucket_list);
+
+
+		char name[_MAX_PATH];
+		for (int i = 0; i < bucket_list->string_count; i++)
+		{
+			riack_string& str = bucket_list->strings[i];
+			memset(name, 0, _MAX_PATH);
+			memcpy(name, str.value, str.len);
+			if (strcmp(m_fs_name.c_str(), name))
+			{
+				RiakTileStore* store = new RiakTileStore("", name, this);
+				pset->Add(store);
+			}
+		}
+
+		riack_free_string_list_p(m_riak, &bucket_list);
+
+		return pset;
 	}
 }

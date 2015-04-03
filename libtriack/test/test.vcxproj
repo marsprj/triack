@@ -41,9 +41,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\DevEnv\cppunit-1.13.2-vs2013\include;../include;E:\DevEnv\riack\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\depends\cppunit-1.13.2\include;..\include;..\depends\riack\include;$(IncludePath)</IncludePath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <LibraryPath>E:\DevEnv\cppunit-1.13.2-vs2013\lib;..\..\lib;E:\DevEnv\riack\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\depends\cppunit-1.13.2\lib;..\..\lib;..\depends\riack\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

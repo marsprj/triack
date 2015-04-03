@@ -9,6 +9,13 @@ namespace radi
 {
 	class RiakFile;
 	class RiakFileSet;
+	class RiakTileStore;
+	class RiakTileStoreSet;
+
+	typedef enum 
+	{
+		radiTileStorePIGS	= 0
+	}TileStoreType;
 
 	class TRIACK_API RiakFS
 	{
@@ -30,6 +37,9 @@ namespace radi
 		RiakFileSet*	ListFiles(const char* dir_key);
 
 		bool			CreateRiakFile(const char* parent_key, const char* f_name, bool is_folder, const char* data_type = "PGIS");
+		RiakTileStore*	CreateTileStore(const char* name, TileStoreType type);
+		RiakTileStore*	GetTileStore(const char* name);
+		RiakTileStoreSet* GetTileStores();
 		
 		void			Release();
 
@@ -41,6 +51,8 @@ namespace radi
 
 	private:
 		bool			CreateRiakFileObj(const char* f_name, const char* f_key, const char* p_key, const char* data_type = "PGIS");
+		RiakTileStore*	CreateTileStorePGS(const char* name);
+		bool			HasBucket(const char* name);
 
 
 	private:

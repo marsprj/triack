@@ -331,8 +331,13 @@ namespace radi
 
 		riack_client* client = m_riak_fs->GetConnection();
 
-		int ret = riack_delete(client, m_key.c_str(), t_key, NULL);
+		riack_string bucket, key;
+		bucket.value = (char*)m_key.c_str();
+		bucket.len = m_key.length();
+		key.value = (char*)t_key;
+		key.len = strlen(t_key);
 
+		int ret = riack_delete(client, &bucket, &key, NULL);
 
 		return (ret==RIACK_SUCCESS);
 	}
