@@ -19,7 +19,7 @@ class RiakTest : public CppUnit::TestFixture
 	//CPPUNIT_TEST(ListKeys);
 	//CPPUNIT_TEST(GetKey);
 	//CPPUNIT_TEST(AddKey_1);	
-	CPPUNIT_TEST(AddKey_2);
+	//CPPUNIT_TEST(AddKey_2);
 	//CPPUNIT_TEST(AddKey_3);
 	//CPPUNIT_TEST(AddKey_4);
 	//CPPUNIT_TEST(AddKey_1_Link);
