@@ -21,38 +21,39 @@ namespace radi
 		virtual ~RiakFile();
 
 	public:
-		bool		IsFolder();
-		bool		IsRoot();
+		bool			IsFolder();
+		bool			IsRoot();
 
-		const char*	GetName();
-		void		SetName(const char* name);
-		const char*	GetKey();
+		const char*		GetName();
+		void			SetName(const char* name);
+		const char*		GetKey();
 
-		const char*	GetStatus();
-		void		SetStatus(const char* status);
-		bool		IsDeleted();
+		const char*		GetStatus();
+		void			SetStatus(const char* status);
+		bool			IsDeleted();
 
-		const char*	GetDataType() const;
-		const char*	GetDataStore() const;
+		const char*		GetDataType() const;
+		const char*		GetDataStore() const;
 
 		RiakTileStore*	GetTileStore();
 
 		RiakFileSet*	GetFiles();
 		RiakFile*		GetRiakFile(const char* name);
 
-		RiakFile*	CreateRiakFolder(const char* name);
+		RiakFile*		CreateFolder(const char* name);
+		RiakFile*		CreateFile(const char* name, const char* type="PGIS");
 
-		bool		AddLink(const char* link_key);
+		bool			AddLink(const char* link_key);
 
-		void		Release();
+		void			Release();
 
 	public:
-		bool		Create(RiakFS* rfs, const char* key, riack_content* robj);
+		bool			Create(RiakFS* rfs, const char* key, riack_content* robj);
 
 	private:
-		void		SetIsFolder(const char* val);
-		void		SetDataType(const char* val, size_t len);
-		void		SetDataStore(const char* val, size_t len);
+		void			SetIsFolder(const char* val);
+		void			SetDataType(const char* val, size_t len);
+		void			SetDataStore(const char* val, size_t len);
 
 	private:
 		bool		m_isFolder;

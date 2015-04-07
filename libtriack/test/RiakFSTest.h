@@ -11,7 +11,10 @@ class RiakFSTest : public CppUnit::TestFixture
 	
 	//CPPUNIT_TEST(GetFolders);
 	//CPPUNIT_TEST(GetTestKeys);
-	CPPUNIT_TEST(CreateFolder);
+
+	//CPPUNIT_TEST(CreateFolder);
+	CPPUNIT_TEST(CreateFile);
+
 
 	//CPPUNIT_TEST(GetGeoMeta);
 
@@ -30,7 +33,9 @@ private:
 	void GetRoot();
 	void GetFolders();
 	void GetTestKeys();
+
 	void CreateFolder();
+	void CreateFile();
 
 	void GetGeoMeta();
 

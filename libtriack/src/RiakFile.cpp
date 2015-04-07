@@ -155,34 +155,42 @@ namespace radi
 		return m_riak_fs->GetRiakFileByName(m_key.c_str(), name);
 	}
 
-	RiakFile* RiakFile::CreateRiakFolder(const char* name)
+	RiakFile* RiakFile::CreateFolder(const char* name)
 	{
 		if (name == NULL)
 		{
 			return NULL;
 		}
 
-		m_riak_fs->CreateRiakFile(m_key.c_str(), name, true);
+		if (!m_riak_fs->CreateRiakFolder(m_key.c_str(), name))
+		{
+			return NULL;
+		}
 
-		return NULL;
+		return GetRiakFile(name);
 	}
 
-	/*
-	riack_copy_string(robj->object.bucket, rbucket);
-	riack_copy_string(robj->object.key, rkey);
+	RiakFile* RiakFile::CreateFile(const char* name, const char* type/*="PGIS"*/)
+	{
+		if (name == NULL)
+		{
+			return NULL;
+		}
 
-	riack_content& r_content = robj->object.content[0];
-	riack_link* r_link = r_content.links;
-	r_content.links = (riack_link*)realloc(r_link, (r_content.link_count + 1)*sizeof(riack_link));
-	r_link = r_content.links + r_content.link_count;
-	r_content.link_count += 1;
+		if (!m_riak_fs->CreateRiakFile(m_key.c_str(), name, type))
+		{
+			return NULL;
+		}
 
-	const char* l_bucket = "test_444";
-	const char* l_key = "key_444";
-	const char* l_tag = "parent";
-	memset(r_link, 0, sizeof(r_link));
-	riack_set_link(*r_link, l_bucket, l_key, l_tag);
-	*/
+		RiakFile* rfile = GetRiakFile(name);
+		RiakTileStore* store = rfile->GetTileStore();
+		if (store != NULL)
+		{
+			store->PutStoreMetaPGIS();
+		}
+		return rfile;
+	}
+
 	bool RiakFile::AddLink(const char* link_key)
 	{
 		if (link_key == NULL)
@@ -205,11 +213,21 @@ namespace radi
 		robj->object.key.value = strdup(m_key.c_str());
 		robj->object.key.len = m_key.length();
 
+		riack_link* r_link = NULL;
 		riack_content& r_content = robj->object.content[0];
-		riack_link* r_link = r_content.links;
-		r_content.links = (riack_link*)realloc(r_link, (r_content.link_count + 1)*sizeof(riack_link));
-		r_link = r_content.links + r_content.link_count;
-		r_content.link_count += 1;
+		if (r_content.link_count > 0)
+		{
+			r_link = r_content.links;
+			r_content.links = (riack_link*)realloc(r_link, (r_content.link_count + 1)*sizeof(riack_link));
+			r_link = r_content.links + r_content.link_count;
+			r_content.link_count += 1;
+		}
+		else
+		{
+			r_content.link_count = 1;
+			r_link = (riack_link*)malloc(sizeof(riack_link)); 
+			r_content.links = r_link;
+		}
 
 		memset(r_link, 0, sizeof(r_link));
 		radi_riack_set_link(*r_link, m_riak_fs->m_fs_name.c_str(), link_key, "parent");

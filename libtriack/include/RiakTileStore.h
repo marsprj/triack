@@ -35,6 +35,8 @@ namespace radi
 		bool		PutConfXML(const char* data);
 		bool		PutConfCDI(const char* data);
 
+		bool		PutStoreMetaPGIS();
+
 		void		Release();
 
 		void		GetTiles();

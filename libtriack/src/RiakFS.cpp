@@ -53,6 +53,12 @@ namespace radi
 		r_link.tag.len = strlen(tag);
 	}
 
+	void radi_riack_set_string(riack_string& rstring, const char* value)
+	{
+		rstring.value = strdup(value);
+		rstring.len = strlen(value);
+	}
+
 	long get_current_time_millis()
 	{
 #ifdef WIN32
@@ -248,7 +254,7 @@ namespace radi
 				RiakFile* rf = NULL;
 				memset(key, 0, RADI_PATH_MAX);
 				memcpy(key, r_link.key.value, r_link.key.len);
-				rf = GetRiakFolder(m_fs_name.c_str(), key);
+				rf = GetRiakFile(m_fs_name.c_str(), key);
 				if (rf != NULL)
 				{
 					files->Add(rf);
@@ -288,7 +294,7 @@ namespace radi
 			{
 				memset(key, 0, RADI_PATH_MAX);
 				memcpy(key, r_link.key.value, r_link.key.len);
-				rf = GetRiakFolder(m_fs_name.c_str(), key);
+				rf = GetRiakFile(m_fs_name.c_str(), key);
 				if (rf != NULL)
 				{
 					printf("%s\n", rf->GetName());
@@ -329,7 +335,7 @@ namespace radi
 		return obj;
 	}
 
-	RiakFile* RiakFS::GetRiakFolder(const char* bucket, const char* key)
+	RiakFile* RiakFS::GetRiakFile(const char* bucket, const char* key)
 	{
 		riack_client* client = GetConnection();
 		if (client == NULL)
@@ -369,14 +375,14 @@ namespace radi
 		return rf;
 	}
 
-	bool RiakFS::CreateRiakFile(const char* parent_key, const char* f_name, bool is_folder, const char* data_type/*="PGIS"*/)
+	bool RiakFS::CreateRiakFolder(const char* parent_key, const char* f_name)
 	{
 		if (parent_key == NULL || f_name == NULL)
 		{
 			return false;
 		}
 
-		RiakFile* pf = GetRiakFolder(m_fs_name.c_str(), parent_key);
+		RiakFile* pf = GetRiakFile(m_fs_name.c_str(), parent_key);
 		if (pf == NULL)
 		{
 			return false;
@@ -385,19 +391,9 @@ namespace radi
 		bool ret = false;
 		char f_key[RADI_PATH_MAX];
 		radi_uuid_generate(f_key, RADI_PATH_MAX);
-		if (is_folder)
-		{
-			ret = CreateRiakFileObj(f_name, f_key, parent_key, data_type);
-		}
-		else
-		{
-
-		}
-
-		if (!ret)
+		if (!CreateRiakFolderObj(f_name, f_key, parent_key))
 		{
 			pf->Release();
-
 			return NULL;
 		}
 
@@ -408,37 +404,53 @@ namespace radi
 		return true;
 	}
 
-	bool RiakFS::CreateRiakFileObj(const char* f_name, const char* f_key, const char* p_key, const char* data_type/*="PGIS"*/)
+	bool RiakFS::CreateRiakFile(const char* parent_key, const char* f_name, const char* data_type/*="PGIS"*/)
+	{
+		if (parent_key == NULL || f_name == NULL)
+		{
+			return false;
+		}
+
+		RiakFile* pf = GetRiakFile(m_fs_name.c_str(), parent_key);
+		if (pf == NULL)
+		{
+			return false;
+		}
+
+		bool ret = false;
+		char f_key[RADI_PATH_MAX];
+		radi_uuid_generate(f_key, RADI_PATH_MAX);
+		if (!CreateRiakFileObj(f_name, f_key, parent_key, data_type))
+		{
+			pf->Release();
+			return NULL;
+		}
+
+		// add link
+		pf->AddLink(f_key);
+
+		pf->Release();
+		return true;
+	}
+
+	bool RiakFS::CreateRiakFolderObj(const char* f_name, const char* f_key, const char* p_key)
 	{
 		const char* type = "text/plain";
 		riack_client* client = GetConnection();
 		riack_object* robj = riack_object_alloc(m_riak);
 
 		// file property
-		robj->bucket.value = strdup(m_fs_name.c_str());
-		robj->bucket.len = m_fs_name.length();
-		robj->key.value = strdup(f_key);
-		robj->key.len = strlen(f_key);
+		radi_riack_set_string(robj->bucket, m_fs_name.c_str());
+		radi_riack_set_string(robj->key, f_key);
+
 		robj->content_count = 1;
 		robj->content = (riack_content*)malloc(sizeof(riack_content));
 		memset(robj->content, 0, sizeof(riack_content));
 		// content type
-		robj->content[0].content_type.value = strdup(type);
-		robj->content[0].content_type.len = strlen(type);
+		radi_riack_set_string(robj->content[0].content_type, type);		
 		// file name
 		robj->content[0].data = (uint8_t*)strdup(f_name);
 		robj->content[0].data_len = strlen(f_name);
-
-		// link
-		//riack_link *r_link = (riack_link *)malloc(sizeof(riack_link));
-		//memset(r_link, 0, sizeof(riack_link));
-		//robj->content->link_count = 1;
-		//robj->content->links = r_link;
-		//radi_riack_set_link()
-		//r_link->bucket.value = strdup(m_fs_name.c_str());
-		//r_link->bucket.len = m_fs_name.length();
-		//r_link->key.value = strdup(p_key);
-		//r_link->key.len = strlen(p_key);
 
 		// user meta
 		riack_pair* r_meta = NULL;
@@ -450,15 +462,6 @@ namespace radi
 		// meta isfolder
 		radi_raick_set_pair(*r_meta,"IS_FOLDER","true");
 		r_meta++;
-
-		// meta storage type
-		if (data_type != NULL)
-		{
-			//meta_key = "IS_FOLDER";
-			//meta_val = "true" : "false";
-			//radi_raick_set_pair(*r_meta,"IS_FOLDER", "true");
-			//r_meta++;
-		}
 
 		// meta storage type
 		radi_raick_set_pair(*r_meta,"DATA_STORAGE_TYPE", "VALUE");
@@ -482,6 +485,71 @@ namespace radi
 
 		int result = riack_put(client, robj, NULL, NULL);
 		//int result = RIACK_SUCCESS;
+
+		riack_free_object_p(m_riak, &robj);
+
+		return (result == RIACK_SUCCESS);
+	}
+
+	bool RiakFS::CreateRiakFileObj(const char* f_name, const char* f_key, const char* p_key, const char* data_type/*="PGIS"*/)
+	{
+		const char* type = "text/plain";
+		riack_client* client = GetConnection();
+		riack_object* robj = riack_object_alloc(m_riak);
+
+		// file property
+		radi_riack_set_string(robj->bucket, m_fs_name.c_str());
+		radi_riack_set_string(robj->key, f_key);
+
+		robj->content_count = 1;
+		robj->content = (riack_content*)malloc(sizeof(riack_content));
+		memset(robj->content, 0, sizeof(riack_content));
+		// content type
+		radi_riack_set_string(robj->content[0].content_type, type);
+		// file name
+		robj->content[0].data = (uint8_t*)strdup(f_name);
+		robj->content[0].data_len = strlen(f_name);
+
+		// user meta
+		riack_pair* r_meta = NULL;
+		robj->content->usermeta_count = 8;
+		r_meta = (riack_pair *)malloc(sizeof(riack_pair)*robj->content->usermeta_count);
+		memset(r_meta, 0, sizeof(riack_pair)*robj->content->usermeta_count);
+		robj->content->usermetas = r_meta;
+
+		// meta IS_FOLDER
+		radi_raick_set_pair(*r_meta, "IS_FOLDER", "false");
+		r_meta++;
+
+		// meta DATA_TYPE
+		radi_raick_set_pair(*r_meta, "DATA_TYPE", data_type);
+		r_meta++;
+
+		// meta DATA_STORAGE_TYPE
+		radi_raick_set_pair(*r_meta, "DATA_STORAGE_TYPE", "BUCKET");
+		r_meta++;
+
+		// meta FILE_NAME
+		radi_raick_set_pair(*r_meta, "FILE_NAME", f_name);
+		r_meta++;
+
+		// meta CREATE_TIME
+		radi_raick_set_pair(*r_meta, "CREATE_TIME", "1427961943715");
+		r_meta++;
+
+		// meta MODIFY_TIME
+		radi_raick_set_pair(*r_meta, "MODIFY_TIME", "1427961943715");
+		r_meta++;
+
+		// meta STATUS
+		radi_raick_set_pair(*r_meta, "STATUS", "COMPLETED");
+		r_meta++;
+
+		// meta MODIFY_TIME
+		radi_raick_set_pair(*r_meta, "SIZE", "0");
+		r_meta++;
+
+		int result = riack_put(client, robj, NULL, NULL);
 
 		riack_free_object_p(m_riak, &robj);
 

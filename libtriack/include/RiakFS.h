@@ -33,11 +33,13 @@ namespace radi
 		void			Close();
 
 		RiakFile*		GetRoot();
-		RiakFile*		GetRiakFolder(const char* bucket, const char* key);
+		RiakFile*		GetRiakFile(const char* bucket, const char* key);
 		RiakFile*		GetRiakFileByName(const char* bucket, const char* name);
 		RiakFileSet*	ListFiles(const char* dir_key);
 
-		bool			CreateRiakFile(const char* parent_key, const char* f_name, bool is_folder, const char* data_type = "PGIS");
+		bool			CreateRiakFolder(const char* parent_key, const char* f_name);
+		bool			CreateRiakFile(const char* parent_key, const char* f_name, const char* type = "PGIS");
+
 		RiakTileStore*	CreateTileStore(const char* name, TileStoreType type);
 		RiakTileStore*	GetTileStore(const char* name);
 		RiakTileStoreSet* GetTileStores();
@@ -51,6 +53,7 @@ namespace radi
 		riack_get_object*	GetRiakObjects(const char* bucket, const char* key);
 
 	private:
+		bool			CreateRiakFolderObj(const char* f_name, const char* f_key, const char* p_key);
 		bool			CreateRiakFileObj(const char* f_name, const char* f_key, const char* p_key, const char* data_type = "PGIS");
 		RiakTileStore*	CreateTileStorePGS(const char* name);
 		bool			HasBucket(const char* name);
@@ -72,6 +75,7 @@ namespace radi
 	{
 		void radi_raick_set_pair(riack_pair& rpair, const char* key, const char* data);
 		void radi_riack_set_link(riack_link& r_link, const char* bucket, const char* key, const char* tag);
+		void radi_riack_set_string(riack_string& rstring, const char* value);
 	}
 }
 

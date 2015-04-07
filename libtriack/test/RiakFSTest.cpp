@@ -91,8 +91,19 @@ void RiakFSTest::CreateFolder()
 	radi::RiakFile* root = m_riak.GetRoot();
 	CPPUNIT_ASSERT(root != NULL);
 	//´´½¨Ä¿Â¼
-	root->CreateRiakFolder("test2");
+	radi::RiakFile* rfile = root->CreateFolder("test2");
+	rfile->Release();
+	root->Release();
+}
 
+void RiakFSTest::CreateFile()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	radi::RiakFile* rdir = root->GetRiakFile("bbbb");
+
+	radi::RiakFile* rfile = rdir->CreateFile("qqqq");
+	rfile->Release();
+	rdir->Release();
 	root->Release();
 }
 
