@@ -5,6 +5,7 @@
 
 namespace radi
 {
+
 	RiakFile::RiakFile() :
 		m_isFolder(false),
 		m_riak_fs(NULL),
@@ -166,9 +167,25 @@ namespace radi
 		return NULL;
 	}
 
-	bool RiakFile::AddLink(const char* key)
+	/*
+	riack_copy_string(robj->object.bucket, rbucket);
+	riack_copy_string(robj->object.key, rkey);
+
+	riack_content& r_content = robj->object.content[0];
+	riack_link* r_link = r_content.links;
+	r_content.links = (riack_link*)realloc(r_link, (r_content.link_count + 1)*sizeof(riack_link));
+	r_link = r_content.links + r_content.link_count;
+	r_content.link_count += 1;
+
+	const char* l_bucket = "test_444";
+	const char* l_key = "key_444";
+	const char* l_tag = "parent";
+	memset(r_link, 0, sizeof(r_link));
+	riack_set_link(*r_link, l_bucket, l_key, l_tag);
+	*/
+	bool RiakFile::AddLink(const char* link_key)
 	{
-		if (key == NULL)
+		if (link_key == NULL)
 		{
 			return false;
 		}
@@ -176,14 +193,29 @@ namespace radi
 		riack_client* client = m_riak_fs->GetConnection();
 		riack_get_object* robj = NULL;
 
-		robj = m_riak_fs->GetRiakObjects("rfs", m_key.c_str());
+		robj = m_riak_fs->GetRiakObjects(m_riak_fs->m_fs_name.c_str(), m_key.c_str());
 		if (!robj->object.content_count)
 		{
 			riack_free_get_object_p(client, &robj);
 			return false;
 		}
 
+		robj->object.bucket.value = strdup(m_riak_fs->m_fs_name.c_str());
+		robj->object.bucket.len = m_riak_fs->m_fs_name.length();
+		robj->object.key.value = strdup(m_key.c_str());
+		robj->object.key.len = m_key.length();
 
+		riack_content& r_content = robj->object.content[0];
+		riack_link* r_link = r_content.links;
+		r_content.links = (riack_link*)realloc(r_link, (r_content.link_count + 1)*sizeof(riack_link));
+		r_link = r_content.links + r_content.link_count;
+		r_content.link_count += 1;
+
+		memset(r_link, 0, sizeof(r_link));
+		radi_riack_set_link(*r_link, m_riak_fs->m_fs_name.c_str(), link_key, "parent");
+
+		riack_put(client, &(robj->object), NULL, NULL);
+		
 		riack_free_get_object_p(client, &robj);
 
 		return true;

@@ -42,7 +42,7 @@ namespace radi
 
 		RiakFile*	CreateRiakFolder(const char* name);
 
-		bool		AddLink(const char* key);
+		bool		AddLink(const char* link_key);
 
 		void		Release();
 

@@ -11,7 +11,7 @@ class RiakFSTest : public CppUnit::TestFixture
 	
 	//CPPUNIT_TEST(GetFolders);
 	//CPPUNIT_TEST(GetTestKeys);
-	//CPPUNIT_TEST(CreateFolder);
+	CPPUNIT_TEST(CreateFolder);
 
 	//CPPUNIT_TEST(GetGeoMeta);
 
@@ -19,7 +19,7 @@ class RiakFSTest : public CppUnit::TestFixture
 	//CPPUNIT_TEST(PutCDI);
 
 	//CPPUNIT_TEST(CreateTileStore);
-	CPPUNIT_TEST(ListTileStore);
+	//CPPUNIT_TEST(ListTileStore);
 
 	CPPUNIT_TEST_SUITE_END();
 public:

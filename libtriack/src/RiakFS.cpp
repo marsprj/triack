@@ -33,6 +33,26 @@ namespace radi
 		}
 	}
 
+	void radi_raick_set_pair(riack_pair& rpair, const char* key, const char* data)
+	{
+		rpair.value_present = 1;
+		rpair.key.value = strdup(key);
+		rpair.key.len = strlen(key);
+		rpair.value_len = strlen(data);
+		rpair.value = (uint8_t*)malloc(sizeof(uint8_t)*rpair.value_len);
+		memcpy(rpair.value, data, rpair.value_len);
+	}
+
+	void radi_riack_set_link(riack_link& r_link, const char* bucket, const char* key, const char* tag)
+	{
+		r_link.bucket.value = strdup(bucket);
+		r_link.bucket.len = strlen(bucket);
+		r_link.key.value = strdup(key);
+		r_link.key.len = strlen(key);
+		r_link.tag.value = strdup(tag);
+		r_link.tag.len = strlen(tag);
+	}
+
 	long get_current_time_millis()
 	{
 #ifdef WIN32
@@ -64,8 +84,8 @@ namespace radi
 	RiakFS::RiakFS() :
 		//m_riak_server("192.168.111.104"),
 		//m_riak_server("192.168.111.151"),
-		//m_riak_server("192.168.111.86"),
-		m_riak_server("123.57.207.198"),
+		m_riak_server("192.168.111.86"),
+		//m_riak_server("123.57.207.198"),
 		m_riak_port(8087),
 		m_riak(NULL),
 		m_fs_name("rfs"),
@@ -228,7 +248,7 @@ namespace radi
 				RiakFile* rf = NULL;
 				memset(key, 0, RADI_PATH_MAX);
 				memcpy(key, r_link.key.value, r_link.key.len);
-				rf = GetRiakFile(m_fs_name.c_str(), key);
+				rf = GetRiakFolder(m_fs_name.c_str(), key);
 				if (rf != NULL)
 				{
 					files->Add(rf);
@@ -268,7 +288,7 @@ namespace radi
 			{
 				memset(key, 0, RADI_PATH_MAX);
 				memcpy(key, r_link.key.value, r_link.key.len);
-				rf = GetRiakFile(m_fs_name.c_str(), key);
+				rf = GetRiakFolder(m_fs_name.c_str(), key);
 				if (rf != NULL)
 				{
 					printf("%s\n", rf->GetName());
@@ -309,7 +329,7 @@ namespace radi
 		return obj;
 	}
 
-	RiakFile* RiakFS::GetRiakFile(const char* bucket, const char* key)
+	RiakFile* RiakFS::GetRiakFolder(const char* bucket, const char* key)
 	{
 		riack_client* client = GetConnection();
 		if (client == NULL)
@@ -356,7 +376,7 @@ namespace radi
 			return false;
 		}
 
-		RiakFile* pf = GetRiakFile(m_fs_name.c_str(), parent_key);
+		RiakFile* pf = GetRiakFolder(m_fs_name.c_str(), parent_key);
 		if (pf == NULL)
 		{
 			return false;
@@ -395,29 +415,30 @@ namespace radi
 		riack_object* robj = riack_object_alloc(m_riak);
 
 		// file property
-		robj->bucket.value = (char*)m_fs_name.c_str();
+		robj->bucket.value = strdup(m_fs_name.c_str());
 		robj->bucket.len = m_fs_name.length();
-		robj->key.value = (char*)f_key;
+		robj->key.value = strdup(f_key);
 		robj->key.len = strlen(f_key);
 		robj->content_count = 1;
 		robj->content = (riack_content*)malloc(sizeof(riack_content));
 		memset(robj->content, 0, sizeof(riack_content));
 		// content type
-		robj->content[0].content_type.value = (char*)type;
+		robj->content[0].content_type.value = strdup(type);
 		robj->content[0].content_type.len = strlen(type);
 		// file name
-		robj->content[0].data = (unsigned char*)f_name;
+		robj->content[0].data = (uint8_t*)strdup(f_name);
 		robj->content[0].data_len = strlen(f_name);
 
 		// link
-		riack_link *r_link = (riack_link *)malloc(sizeof(riack_link));
-		memset(r_link, 0, sizeof(riack_link));
-		robj->content->link_count = 1;
-		robj->content->links = r_link;
-		r_link->bucket.value = (char*)m_fs_name.c_str();
-		r_link->bucket.len = m_fs_name.length();
-		r_link->key.value = (char*)p_key;
-		r_link->key.len = strlen(p_key);
+		//riack_link *r_link = (riack_link *)malloc(sizeof(riack_link));
+		//memset(r_link, 0, sizeof(riack_link));
+		//robj->content->link_count = 1;
+		//robj->content->links = r_link;
+		//radi_riack_set_link()
+		//r_link->bucket.value = strdup(m_fs_name.c_str());
+		//r_link->bucket.len = m_fs_name.length();
+		//r_link->key.value = strdup(p_key);
+		//r_link->key.len = strlen(p_key);
 
 		// user meta
 		riack_pair* r_meta = NULL;
@@ -427,69 +448,36 @@ namespace radi
 		robj->content->usermetas = r_meta;
 
 		// meta isfolder
-		const char* meta_key = "IS_FOLDER";
-		const char* meta_val = "true";
-		r_meta->key.value = (char*)meta_key;
-		r_meta->key.len = strlen(meta_key);
-		r_meta->value = (unsigned char*)meta_val;
-		r_meta->value_len = strlen(meta_val);
+		radi_raick_set_pair(*r_meta,"IS_FOLDER","true");
 		r_meta++;
 
 		// meta storage type
-		//if (data_type != NULL)
-		//{
-		//	//meta_key = "IS_FOLDER";
-		//	//meta_val = "true" : "false";
-		//	//r_meta->key.value = (char*)meta_key;
-		//	//r_meta->key.len = strlen(meta_key);
-		//	//r_meta->value = (unsigned char*)meta_val;
-		//	//r_meta->value_len = strlen(meta_val);
-		//	//r_meta++;
-		//}
+		if (data_type != NULL)
+		{
+			//meta_key = "IS_FOLDER";
+			//meta_val = "true" : "false";
+			//radi_raick_set_pair(*r_meta,"IS_FOLDER", "true");
+			//r_meta++;
+		}
 
 		// meta storage type
-		meta_key = "DATA_STORAGE_TYPE";
-		meta_val = "VALUE";
-		r_meta->key.value = (char*)meta_key;
-		r_meta->key.len = strlen(meta_key);
-		r_meta->value = (unsigned char*)meta_val;
-		r_meta->value_len = strlen(meta_val);
+		radi_raick_set_pair(*r_meta,"DATA_STORAGE_TYPE", "VALUE");
 		r_meta++;
 
 		// meta FILE_NAME
-		meta_key = "FILE_NAME";
-		meta_val = f_name;
-		r_meta->key.value = (char*)meta_key;
-		r_meta->key.len = strlen(meta_key);
-		r_meta->value = (unsigned char*)meta_val;
-		r_meta->value_len = strlen(meta_val);
+		radi_raick_set_pair(*r_meta,"FILE_NAME", f_name);
 		r_meta++;
 
 		// meta DESCRIBE
-		meta_key = "DESCRIBE";
-		meta_val = f_name;
-		r_meta->key.value = (char*)meta_key;
-		r_meta->key.len = strlen(meta_key);
-		r_meta->value = (unsigned char*)meta_val;
-		r_meta->value_len = strlen(meta_val);
+		radi_raick_set_pair(*r_meta,"DESCRIBE", f_name);
 		r_meta++;
 
 		// meta CREATE_TIME
-		meta_key = "CREATE_TIME";
-		meta_val = f_name;
-		r_meta->key.value = (char*)meta_key;
-		r_meta->key.len = strlen(meta_key);
-		r_meta->value = (unsigned char*)meta_val;
-		r_meta->value_len = strlen(meta_val);
+		radi_raick_set_pair(*r_meta,"CREATE_TIME", "1427961943715");
 		r_meta++;
 
 		// meta MODIFY_TIME
-		meta_key = "MODIFY_TIME";
-		meta_val = f_name;
-		r_meta->key.value = (char*)meta_key;
-		r_meta->key.len = strlen(meta_key);
-		r_meta->value = (unsigned char*)meta_val;
-		r_meta->value_len = strlen(meta_val);
+		radi_raick_set_pair(*r_meta,"MODIFY_TIME", "1427961943715");
 		r_meta++;
 
 		int result = riack_put(client, robj, NULL, NULL);

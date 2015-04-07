@@ -19,6 +19,7 @@ namespace radi
 
 	class TRIACK_API RiakFS
 	{
+		friend class RiakFile;
 	public:
 		RiakFS();
 		RiakFS(const char* server, int port);
@@ -32,7 +33,7 @@ namespace radi
 		void			Close();
 
 		RiakFile*		GetRoot();
-		RiakFile*		GetRiakFile(const char* bucket, const char* key);
+		RiakFile*		GetRiakFolder(const char* bucket, const char* key);
 		RiakFile*		GetRiakFileByName(const char* bucket, const char* name);
 		RiakFileSet*	ListFiles(const char* dir_key);
 
@@ -66,6 +67,12 @@ namespace radi
 		std::string		m_fs_root;
 
 	};
+
+	extern "C"
+	{
+		void radi_raick_set_pair(riack_pair& rpair, const char* key, const char* data);
+		void radi_riack_set_link(riack_link& r_link, const char* bucket, const char* key, const char* tag);
+	}
 }
 
 #endif //__TRIAK_FILE_SYSTEM_H__
