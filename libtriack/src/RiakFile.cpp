@@ -162,6 +162,13 @@ namespace radi
 			return NULL;
 		}
 
+		RiakFile* rfile = GetRiakFile(name);
+		if (rfile)
+		{
+			rfile->Release();
+			return NULL;
+		}
+
 		if (!m_riak_fs->CreateRiakFolder(m_key.c_str(), name))
 		{
 			return NULL;
@@ -177,12 +184,19 @@ namespace radi
 			return NULL;
 		}
 
+		RiakFile* rfile = GetRiakFile(name);
+		if (rfile)
+		{
+			rfile->Release();
+			return NULL;
+		}
+
 		if (!m_riak_fs->CreateRiakFile(m_key.c_str(), name, type))
 		{
 			return NULL;
 		}
 
-		RiakFile* rfile = GetRiakFile(name);
+		rfile = GetRiakFile(name);
 		RiakTileStore* store = rfile->GetTileStore();
 		if (store != NULL)
 		{

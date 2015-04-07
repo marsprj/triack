@@ -1,0 +1,20 @@
+<?xml  version="1.0"  encoding="UTF-8"?>
+
+<GeoBeans>  
+    <TileStore>  
+        <Name>wgs84_vector_2to9_Layers</Name>    
+        <Description>wgs84_vector_2to9_Layers</Description>    
+        <TilePath>G:\Data\tar\vector\wgs84_vector_2to9_Layers.tar</TilePath>    
+        <IndexPath>.\wgs84_vector_2to9_Layers.idx\</IndexPath>    
+        <Projection>PGIS</Projection>    
+        <Bound>-256.0,-128.0,256.0,128.0</Bound>    
+        <TileSize>  
+            <Width>256</Width>    
+            <Height>256</Height>  
+        </TileSize>    
+        <TileName>png</TileName>    
+        <StartLevel>2</StartLevel>    
+        <EndLevel>9</EndLevel>    
+        <Nodes>a,b,c,d</Nodes>  
+    </TileStore>  
+</GeoBeans>

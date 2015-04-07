@@ -383,8 +383,9 @@ namespace radi
 		}
 
 		RiakFile* pf = GetRiakFile(m_fs_name.c_str(), parent_key);
-		if (pf == NULL)
+		if (pf)
 		{
+			pf->Release();
 			return false;
 		}
 
@@ -412,11 +413,11 @@ namespace radi
 		}
 
 		RiakFile* pf = GetRiakFile(m_fs_name.c_str(), parent_key);
-		if (pf == NULL)
+		if (pf==NULL)
 		{
 			return false;
 		}
-
+		
 		bool ret = false;
 		char f_key[RADI_PATH_MAX];
 		radi_uuid_generate(f_key, RADI_PATH_MAX);

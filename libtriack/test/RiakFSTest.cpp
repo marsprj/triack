@@ -101,7 +101,7 @@ void RiakFSTest::CreateFile()
 	radi::RiakFile* root = m_riak.GetRoot();
 	radi::RiakFile* rdir = root->GetRiakFile("bbbb");
 
-	radi::RiakFile* rfile = rdir->CreateFile("qqqq");
+	radi::RiakFile* rfile = rdir->CreateFile("eeee");
 	rfile->Release();
 	rdir->Release();
 	root->Release();
