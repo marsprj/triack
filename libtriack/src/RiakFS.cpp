@@ -96,8 +96,8 @@ namespace radi
 	RiakFS::RiakFS() :
 		//m_riak_server("192.168.111.104"),
 		//m_riak_server("192.168.111.151"),
-		//m_riak_server("192.168.111.86"),
-		m_riak_server("123.57.207.198"),
+		m_riak_server("192.168.111.86"),
+		//m_riak_server("123.57.207.198"),
 		m_riak_port(8087),
 		m_riak(NULL),
 		m_fs_name("rfs"),
@@ -657,5 +657,77 @@ namespace radi
 		riack_free_string_list_p(m_riak, &bucket_list);
 
 		return pset;
+	}
+
+	bool RiakFS::HasFile(const char* parent_key, const char* name)
+	{
+		riack_get_object* robj = GetRiakObjects(m_fs_name.c_str(), parent_key);
+
+		if (!robj->object.content_count)
+		{
+			riack_free_get_object_p(m_riak, &robj);
+			return false;
+		}
+		
+		char key[RADI_PATH_MAX];
+		char fname[RADI_PATH_MAX]; 
+		riack_content* r_content = &(robj->object.content[0]);
+		riack_link* r_link = &(r_content->links[0]);
+		for (int i = 0; i < r_content->link_count; i++, r_link++)
+		{
+			memset(key, 0, RADI_PATH_MAX);
+			strncpy(key, r_link->key.value, r_link->key.len);
+			if (GetFileNameByKey(fname, RADI_PATH_MAX, key))
+			{
+				if (!strcmp(fname, name))
+				{
+					riack_free_get_object_p(m_riak, &robj);
+					return true;
+				}
+			}
+			
+		}
+
+		riack_free_get_object_p(m_riak, &robj);
+
+		return false;
+	}
+
+	bool RiakFS::GetFileNameByKey(char* fname, size_t fsize, const char* key)
+	{
+		riack_get_object* robj = GetRiakObjects(m_fs_name.c_str(), key);
+
+		if (!robj->object.content_count)
+		{
+			riack_free_get_object_p(m_riak, &robj);
+			return false;
+		}
+
+		riack_content* r_content = &(robj->object.content[0]);
+		riack_pair* r_pair = &(r_content->usermetas[0]);
+		for (int i = 0; i < r_content->usermeta_count; i++, r_pair++)
+		{
+			if (!strncmp("FILE_NAME", r_pair->key.value, r_pair->key.len))
+			{
+				memset(fname, 0, fsize);
+				memcpy(fname, r_pair->value, r_pair->value_len);
+				riack_free_get_object_p(m_riak, &robj);
+				return true;
+			}
+		}
+
+		//char key[RADI_PATH_MAX];
+		//char fname[RADI_PATH_MAX];
+		//riack_content* r_content = &(robj->object.content[0]);
+		//riack_link* r_link = &(r_content->links[0]);
+		//for (int i = 0; i < r_content->link_count; i++, r_link++)
+		//{
+		//	strncpy(key, r_link->key.value, r_link->key.len);
+		//	GetFileNameByKey(fname, key);
+		//}
+
+		riack_free_get_object_p(m_riak, &robj);
+
+		return false;
 	}
 }

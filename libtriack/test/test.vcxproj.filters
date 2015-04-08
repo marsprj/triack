@@ -24,12 +24,18 @@
     <ClCompile Include="RiackTest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="RiakImportTest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RiakFSTest.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="RiackTest.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RiakImportTest.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

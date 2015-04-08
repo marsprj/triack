@@ -4,6 +4,7 @@
 #include "RiakFileSet.h"
 #include "RiakTileStore.h"
 #include "RiakTileStoreSet.h"
+#include <windows.h>
 
 CPPUNIT_TEST_SUITE_REGISTRATION(RiakFSTest);
 
@@ -96,16 +97,16 @@ void RiakFSTest::CreateFolder()
 	root->Release();
 }
 
-void RiakFSTest::CreateFile()
-{
-	radi::RiakFile* root = m_riak.GetRoot();
-	radi::RiakFile* rdir = root->GetRiakFile("bbbb");
-
-	radi::RiakFile* rfile = rdir->CreateFile("eeee");
-	rfile->Release();
-	rdir->Release();
-	root->Release();
-}
+//void RiakFSTest::CreateFile()
+//{
+//	radi::RiakFile* root = m_riak.GetRoot();
+//	radi::RiakFile* rdir = root->GetRiakFile("bbbb");
+//
+//	radi::RiakFile* rfile = rdir->CreateRiakFile("eeee");
+//	rfile->Release();
+//	rdir->Release();
+//	root->Release();
+//}
 
 /*
  * RiakFS中的文件和目录都使用RiakFile类。对于文件类型的RiakFile，可以过去一个RiakTileStore对象，该对象管理tile。
@@ -206,4 +207,37 @@ void RiakFSTest::ListTileStore()
 	}
 
 	stores->Release();
+}
+
+void RiakFSTest::GetTileStoreVolume()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	radi::RiakFile* rf = root->GetRiakFile("vector_wgs84_2_to_9");
+
+	DWORD ts = GetTickCount();
+
+	radi::RiakTileStore* store = rf->GetTileStore();
+	g_int64 volume = store->GetVolume();
+	printf("%lld\n", volume);
+
+	DWORD te = GetTickCount();
+	printf("[Time]:%d秒", (te - ts) / 1000 / 1000);
+	rf->Release();
+	root->Release();
+}
+
+void RiakFSTest::UpdateTileStoreVolume()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	radi::RiakFile* rf = root->GetRiakFile("vector_wgs84_2_to_9");
+
+	DWORD ts = GetTickCount();
+
+	radi::RiakTileStore* store = rf->GetTileStore();
+	store->UpdateVolume();
+
+	DWORD te = GetTickCount();
+	printf("[Time]:%d秒", (te - ts) / 1000 / 1000);
+	rf->Release();
+	root->Release();
 }

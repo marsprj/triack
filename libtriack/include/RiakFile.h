@@ -41,7 +41,7 @@ namespace radi
 		RiakFile*		GetRiakFile(const char* name);
 
 		RiakFile*		CreateFolder(const char* name);
-		RiakFile*		CreateFile(const char* name, const char* type="PGIS");
+		RiakFile*		CreateRiakFile(const char* name, const char* type="PGIS");
 
 		bool			AddLink(const char* link_key);
 

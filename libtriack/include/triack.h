@@ -25,6 +25,12 @@
 #	define radi_strncpy		strncpy
 #endif
 
+#ifdef WIN32
+typedef int64_t		g_int64;
+#else
+typedef long long	g_int64;
+#endif
+
 #define RADI_PATH_MAX		256
 
 namespace radi

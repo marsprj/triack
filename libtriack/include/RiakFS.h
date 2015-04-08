@@ -7,7 +7,6 @@
 
 namespace radi
 {
-
 	class RiakFile;
 	class RiakFileSet;
 	class RiakTileStore;
@@ -21,6 +20,7 @@ namespace radi
 	class TRIACK_API RiakFS
 	{
 		friend class RiakFile;
+		friend class RiakTileStore;
 	public:
 		RiakFS();
 		RiakFS(const char* server, int port);
@@ -37,6 +37,7 @@ namespace radi
 		RiakFile*		GetRiakFile(const char* bucket, const char* key);
 		RiakFile*		GetRiakFileByName(const char* bucket, const char* name);
 		RiakFileSet*	ListFiles(const char* dir_key);
+		bool			HasFile(const char* parent_key, const char* name);
 
 		bool			CreateRiakFolder(const char* parent_key, const char* f_name);
 		bool			CreateRiakFile(const char* parent_key, const char* f_name, const char* type = "PGIS");
@@ -50,6 +51,7 @@ namespace radi
 	public:
 		riack_client*	GetConnection();
 		bool			GetRiakFolderKey(const char* bucket, const char* parent_key, const char* file_name, char* file_key);
+		bool			GetFileNameByKey(char* fname, size_t fsize, const char* key);
 
 		riack_get_object*	GetRiakObjects(const char* bucket, const char* key);
 

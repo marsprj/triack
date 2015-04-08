@@ -10,6 +10,12 @@ namespace radi
 	class RiakFS;
 	class RiakTile;
 
+	typedef struct
+	{
+		int		count;
+		g_int64	volume;
+	}TileStoreInfo;
+
 	class TRIACK_API RiakTileStore
 	{
 	public:
@@ -21,11 +27,19 @@ namespace radi
 		const char*	GetName();
 		const char*	GetStatus();
 
+		void		GetInfo(TileStoreInfo& info);
+
 		RiakTile*	GetTile(const char* t_key);
 		bool		PutTile(const char* t_key, const unsigned char* t_data, size_t size, const char* content_type);
 		bool		PutTile(const char* t_key, const char* t_path);
+		bool		PutTile(int level, int row, int col, const char* t_path);
+		bool		PutTile(int level, int row, int col, const unsigned char* t_data, size_t size, const char* content_type);
 
 		bool		DeleteTile(const char* t_key);
+
+		g_int64		GetVolume();
+		g_int64		GetVolume(const char* key);
+		bool		UpdateVolume();
 
 		const char* GetGeoMeta();
 		const char* GetConfXML();

@@ -12,7 +12,7 @@ class RiakFSTest : public CppUnit::TestFixture
 	//CPPUNIT_TEST(GetFolders);
 	//CPPUNIT_TEST(GetTestKeys);
 
-	CPPUNIT_TEST(CreateFolder);
+	//CPPUNIT_TEST(CreateFolder);
 	//CPPUNIT_TEST(CreateFile);
 
 
@@ -23,6 +23,10 @@ class RiakFSTest : public CppUnit::TestFixture
 
 	//CPPUNIT_TEST(CreateTileStore);
 	//CPPUNIT_TEST(ListTileStore);
+
+	//CPPUNIT_TEST(GetTileStoreVolume);
+
+	CPPUNIT_TEST(UpdateTileStoreVolume);
 
 	CPPUNIT_TEST_SUITE_END();
 public:
@@ -35,7 +39,7 @@ private:
 	void GetTestKeys();
 
 	void CreateFolder();
-	void CreateFile();
+	//void CreateFile();
 
 	void GetGeoMeta();
 
@@ -44,6 +48,10 @@ private:
 
 	void CreateTileStore();
 	void ListTileStore();
+
+	void GetTileStoreVolume();
+
+	void UpdateTileStoreVolume();
 
 private:
 	radi::RiakFS m_riak;

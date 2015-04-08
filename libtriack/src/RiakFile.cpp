@@ -152,6 +152,10 @@ namespace radi
 
 	RiakFile* RiakFile::GetRiakFile(const char* name)
 	{
+		if (!m_riak_fs->HasFile(m_key.c_str(), name))
+		{
+			return NULL;
+		}
 		return m_riak_fs->GetRiakFileByName(m_key.c_str(), name);
 	}
 
@@ -177,19 +181,20 @@ namespace radi
 		return GetRiakFile(name);
 	}
 
-	RiakFile* RiakFile::CreateFile(const char* name, const char* type/*="PGIS"*/)
+	RiakFile* RiakFile::CreateRiakFile(const char* name, const char* type/*="PGIS"*/)
 	{
 		if (name == NULL)
 		{
 			return NULL;
 		}
 
-		RiakFile* rfile = GetRiakFile(name);
-		if (rfile)
-		{
-			rfile->Release();
-			return NULL;
-		}
+		RiakFile* rfile = NULL;
+		//rfile = GetRiakFile(name);
+		//if (rfile)
+		//{
+		//	rfile->Release();
+		//	return NULL;
+		//}
 
 		if (!m_riak_fs->CreateRiakFile(m_key.c_str(), name, type))
 		{

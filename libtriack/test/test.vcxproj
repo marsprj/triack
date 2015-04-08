@@ -162,10 +162,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RiackTest.cpp" />
     <ClCompile Include="RiakFSTest.cpp" />
+    <ClCompile Include="RiakImportTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RiackTest.h" />
     <ClInclude Include="RiakFSTest.h" />
+    <ClInclude Include="RiakImportTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

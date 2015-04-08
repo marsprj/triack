@@ -170,6 +170,20 @@ namespace radi
 		return ret;
 	}
 
+	bool RiakTileStore::PutTile(int level, int row, int col, const char* t_path)
+	{
+		char key[RADI_PATH_MAX];
+		sprintf(key, "%dx%dx%d", level, row, col);
+		return PutTile(key, t_path);
+	}
+
+	bool RiakTileStore::PutTile(int level, int row, int col, const unsigned char* t_data, size_t size, const char* content_type)
+	{
+		char key[RADI_PATH_MAX];
+		sprintf(key, "%dx%dx%d", level, row, col);
+		return PutTile(key, t_data, size, content_type);
+	}
+
 	void RiakTileStore::GetTiles()
 	{
 		riack_client* client = m_riak_fs->GetConnection();
@@ -351,5 +365,121 @@ namespace radi
 		PutConfXML(xml);
 		PutGeoMeta(meta);
 		return true;
+	}
+
+	g_int64 RiakTileStore::GetVolume()
+	{
+		riack_client* client = m_riak_fs->GetConnection();
+		if (!client)
+		{
+			return 0;
+		}
+
+		g_int64 volume = 0;
+		riack_string_linked_list *list;
+		riack_string_linked_list *rkey;
+		riack_string bucket;
+		bucket.value = (char*)m_key.c_str();
+		bucket.len = m_key.length();
+
+		int ret = riack_list_keys(client, &bucket, &list);
+
+		char key[RADI_PATH_MAX];
+		for (rkey = list; rkey != NULL; rkey = rkey->next)
+		{
+			memset(key, 0, RADI_PATH_MAX);
+			memcpy(key, rkey->string.value, rkey->string.len);
+
+			volume += GetVolume(key);
+		}
+		
+		riack_free_string_linked_list_p(client, &list);
+		return volume;
+	}
+
+	g_int64 RiakTileStore::GetVolume(const char* key)
+	{
+		riack_get_object* robj = m_riak_fs->GetRiakObjects(m_key.c_str(), key);
+		if (!robj->object.content_count)
+		{
+			return 0;
+		}
+
+		g_int64 volume = robj->object.content[0].data_len;
+		riack_free_get_object_p(m_riak_fs->GetConnection(), &robj);
+		return volume;
+	}
+
+	bool RiakTileStore::UpdateVolume()
+	{
+		riack_get_object* robj = m_riak_fs->GetRiakObjects(m_riak_fs->m_fs_name.c_str(), m_key.c_str());
+		if (!robj->object.content_count)
+		{
+			return false;
+		}
+
+		g_int64 volume = GetVolume();
+		//g_int64 volume = 100;
+
+		radi_riack_set_string(robj->object.bucket, m_riak_fs->m_fs_name.c_str());
+		radi_riack_set_string(robj->object.key, m_key.c_str());
+
+		riack_content& r_content = robj->object.content[0];	
+		riack_pair* r_pair = &(r_content.usermetas[0]);
+		for (int i = 0; i < r_content.usermeta_count; i++, r_pair++)
+		{
+			if (!strncmp("SIZE", r_pair->key.value, r_pair->key.len))
+			{
+				char str[RADI_PATH_MAX] = { 0 };
+				sprintf(str, "%lld", volume);
+				r_pair->value_len = strlen(str);
+				if (r_pair->value != NULL)
+				{
+					free(r_pair->value);
+				}
+				r_pair->value = (uint8_t*)strdup(str);
+				r_pair->value_present = 1;
+				break;
+			}
+		}
+
+		riack_put(m_riak_fs->GetConnection(), &(robj->object), NULL, NULL);
+
+		riack_free_get_object_p(m_riak_fs->GetConnection(), &robj);
+		
+		return true;
+	}
+
+	void RiakTileStore::GetInfo(TileStoreInfo& info)
+	{
+		riack_client* client = m_riak_fs->GetConnection();
+		if (!client)
+		{
+			return;
+		}
+
+		info.count = 0;
+		info.volume = 0;
+
+		g_int64 volume = 0;
+		riack_string_linked_list *list;
+		riack_string_linked_list *rkey;
+		riack_string bucket;
+		bucket.value = (char*)m_key.c_str();
+		bucket.len = m_key.length();
+
+		int ret = riack_list_keys(client, &bucket, &list);
+
+		char key[RADI_PATH_MAX];
+		for (rkey = list; rkey != NULL; rkey = rkey->next)
+		{
+			memset(key, 0, RADI_PATH_MAX);
+			memcpy(key, rkey->string.value, rkey->string.len);
+
+			info.count++;
+			info.volume += GetVolume(key);
+		}
+
+		riack_free_string_linked_list_p(client, &list);
 	}
 }
