@@ -7,6 +7,7 @@
 
 namespace radi
 {
+
 	class RiakFile;
 	class RiakFileSet;
 	class RiakTileStore;

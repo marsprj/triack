@@ -5,6 +5,8 @@
 #include "RiakTileStoreSet.h"
 #include "stdlib.h"
 
+#include <time.h>
+
 #ifdef WIN32
 #	include <rpc.h>
 #endif
@@ -59,10 +61,14 @@ namespace radi
 		rstring.len = strlen(value);
 	}
 
-	long get_current_time_millis()
+
+	long long get_current_time_millis()
 	{
 #ifdef WIN32
-		return 0;
+		time_t now;
+		time(&now);
+		return (long long)(now * 1000);
+		//return 0;
 #else
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
@@ -477,11 +483,17 @@ namespace radi
 		r_meta++;
 
 		// meta CREATE_TIME
-		radi_raick_set_pair(*r_meta,"CREATE_TIME", "1427961943715");
+		//get_current_time_millis
+		char s_time[RADI_PATH_MAX];
+		long long lt = get_current_time_millis();
+		sprintf(s_time, "%lld", lt);
+		//radi_raick_set_pair(*r_meta,"CREATE_TIME", "1427961943715");
+		radi_raick_set_pair(*r_meta, "CREATE_TIME", s_time);
 		r_meta++;
 
 		// meta MODIFY_TIME
-		radi_raick_set_pair(*r_meta,"MODIFY_TIME", "1427961943715");
+		//radi_raick_set_pair(*r_meta,"MODIFY_TIME", "1427961943715");
+		radi_raick_set_pair(*r_meta, "MODIFY_TIME", s_time);
 		r_meta++;
 
 		int result = riack_put(client, robj, NULL, NULL);
