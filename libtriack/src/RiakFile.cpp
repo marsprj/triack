@@ -210,6 +210,33 @@ namespace radi
 		return rfile;
 	}
 
+	RiakFile* RiakFile::CreateRiakFile(const char* name, int start_level, int end_level, const char* type/*="PGIS"*/)
+	{
+		if (start_level > end_level)
+		{
+			return NULL;
+		}
+
+		if (name == NULL)
+		{
+			return NULL;
+		}
+
+		RiakFile* rfile = NULL;
+		if (!m_riak_fs->CreateRiakFile(m_key.c_str(), name, type))
+		{
+			return NULL;
+		}
+
+		rfile = GetRiakFile(name);
+		RiakTileStore* store = rfile->GetTileStore();
+		if (store != NULL)
+		{
+			store->PutStoreMetaPGIS(start_level, end_level);
+		}
+		return rfile;
+	}
+
 	bool RiakFile::AddLink(const char* link_key)
 	{
 		if (link_key == NULL)

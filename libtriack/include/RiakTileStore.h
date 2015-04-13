@@ -48,8 +48,10 @@ namespace radi
 		bool		PutGeoMeta(const char* data);
 		bool		PutConfXML(const char* data);
 		bool		PutConfCDI(const char* data);
+		bool		PutGeoMetaPGIS(int start_level, int end_level);
 
 		bool		PutStoreMetaPGIS();
+		bool		PutStoreMetaPGIS(int start_level, int end_level);
 
 		void		Release();
 

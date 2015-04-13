@@ -303,7 +303,7 @@ namespace radi
 				rf = GetRiakFile(m_fs_name.c_str(), key);
 				if (rf != NULL)
 				{
-					printf("%s\n", rf->GetName());
+					//printf("%s\n", rf->GetName());
 					if (!strcmp(rf->GetName(), name))
 					{
 						break;
