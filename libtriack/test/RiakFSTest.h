@@ -26,7 +26,9 @@ class RiakFSTest : public CppUnit::TestFixture
 
 	//CPPUNIT_TEST(GetTileStoreVolume);
 
-	CPPUNIT_TEST(UpdateTileStoreVolume);
+	//CPPUNIT_TEST(UpdateTileStoreVolume);
+
+	CPPUNIT_TEST(PutGFTile);
 
 	CPPUNIT_TEST_SUITE_END();
 public:
@@ -52,6 +54,8 @@ private:
 	void GetTileStoreVolume();
 
 	void UpdateTileStoreVolume();
+
+	void PutGFTile();
 
 private:
 	radi::RiakFS m_riak;

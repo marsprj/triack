@@ -96,8 +96,8 @@ namespace radi
 	RiakFS::RiakFS() :
 		//m_riak_server("192.168.111.104"),
 		//m_riak_server("192.168.111.151"),
-		m_riak_server("192.168.111.86"),
-		//m_riak_server("123.57.207.198"),
+		//m_riak_server("192.168.111.86"),
+		m_riak_server("123.57.207.198"),
 		m_riak_port(8087),
 		m_riak(NULL),
 		m_fs_name("rfs"),

@@ -241,3 +241,22 @@ void RiakFSTest::UpdateTileStoreVolume()
 	rf->Release();
 	root->Release();
 }
+
+void RiakFSTest::PutGFTile()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	radi::RiakFile* rf = root->GetRiakFile("test");
+
+	radi::RiakTileStore* store = rf->GetTileStore();
+
+	store->PutTile("2x1x1", "G:\\temp\\tile\\2x1x1.png");
+	store->PutTile("2x1x2", "G:\\temp\\tile\\2x1x2.png");
+	store->PutTile("2x1x3", "G:\\temp\\tile\\2x1x3.png");
+	store->PutTile("2x2x1", "G:\\temp\\tile\\2x2x1.png");
+	store->PutTile("2x2x2", "G:\\temp\\tile\\2x2x2.png");
+	store->PutTile("2x2x3", "G:\\temp\\tile\\2x2x3.png");
+
+
+	rf->Release();
+	root->Release();
+}

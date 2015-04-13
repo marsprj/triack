@@ -12,7 +12,8 @@ namespace radi
 #define RADI_CONF_XML_KEY "Layers[conf.xml"
 #define RADI_CONF_CDI_KEY "Layers[conf.cdi"
 
-	char* pgis_scales[] = { "393998400.6595608", "1.0000040861108481",
+	char* pgis_scales[] = { "1", "1"
+		"393998400.6595608", "1.0000040861108481",
 		"196999200.3297804", "0.50000204305542406",
 		"98499600.1648902", "0.25000102152771203",
 		"49249800.0824451", "0.12500051076385602",
@@ -410,7 +411,7 @@ namespace radi
 			meta.append("<LODInfo type = \"typens:LODInfo\">");
 
 			meta.append("<LevelID>");
-			meta.append(level);
+			meta.append(counter);
 			meta.append("</LevelID>");
 
 			meta.append("<Scale>");
