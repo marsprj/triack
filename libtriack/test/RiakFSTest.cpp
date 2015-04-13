@@ -245,7 +245,8 @@ void RiakFSTest::UpdateTileStoreVolume()
 void RiakFSTest::PutGFTile()
 {
 	radi::RiakFile* root = m_riak.GetRoot();
-	radi::RiakFile* rf = root->GetRiakFile("test");
+	radi::RiakFile* rf = root->CreateRiakFile("test444",12,14);
+	//radi::RiakFile* rf = root->GetRiakFile("test");
 
 	radi::RiakTileStore* store = rf->GetTileStore();
 
