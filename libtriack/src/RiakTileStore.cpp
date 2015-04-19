@@ -459,6 +459,20 @@ namespace radi
 		return PutTile(RADI_CONF_CDI_KEY, (unsigned char*)meta.c_str(), meta.length(), "text/plain");
 	}
 
+	bool RiakTileStore::UpdateConfCDI(double xmin, double ymin, double xmax, double ymax)
+	{
+		std::stringstream ss;
+		ss << "<?xml  version=\"1.0\"  encoding=\"UTF-8\"?>";
+		ss << "<EnvelopeN  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"  xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.0\"  xsi:type=\"typens:EnvelopeN\">";
+		ss << "    <XMin>" << xmin << "</XMin>";
+		ss << "    <YMin>" << ymin << "< / YMin>";
+		ss << "    <XMax>" << xmax << "< / XMax>";
+		ss << "    <YMax>" << ymax << "< / YMax>";
+		ss << "</EnvelopeN>";
+		std::string meta = ss.str();
+		return PutTile(RADI_CONF_CDI_KEY, (unsigned char*)meta.c_str(), meta.length(), "text/plain");
+	}
+
 	bool RiakTileStore::PutPutConfXMLPGIS(int start_level, int end_level)
 	{
 		char level[_MAX_PATH];

@@ -52,6 +52,8 @@ namespace radi
 		bool		PutConfCDI(const char* data);
 		bool		PutPutConfXMLPGIS(int start_level, int end_level);
 
+		bool		UpdateConfCDI(double xmin, double ymin, double xmax, double ymax);
+
 		bool		PutStoreMetaPGIS();
 		bool		PutStoreMetaPGIS(int start_level, int end_level, double xmin, double ymin, double xmax, double ymax);
 		
