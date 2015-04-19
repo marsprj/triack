@@ -210,7 +210,7 @@ namespace radi
 		return rfile;
 	}
 
-	RiakFile* RiakFile::CreateRiakFile(const char* name, int start_level, int end_level, const char* type/*="PGIS"*/)
+	RiakFile* RiakFile::CreateRiakFile(const char* name, int start_level, int end_level, double xmin, double ymin, double xmax, double ymax, const char* type/*="PGIS"*/)
 	{
 		if (start_level > end_level)
 		{
@@ -232,7 +232,7 @@ namespace radi
 		RiakTileStore* store = rfile->GetTileStore();
 		if (store != NULL)
 		{
-			store->PutStoreMetaPGIS(start_level, end_level);
+			store->PutStoreMetaPGIS(start_level, end_level,xmin,ymin,xmax, ymax);
 		}
 		return rfile;
 	}
