@@ -261,3 +261,18 @@ void RiakFSTest::PutGFTile()
 	//rf->Release();
 	//root->Release();
 }
+
+void RiakFSTest::GetExtent()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	radi::RiakFile* folder = root->GetRiakFile("GF1");
+	radi::RiakFile* rf = folder->GetRiakFile("store9");
+
+	radi::RiakTileStore* store = rf->GetTileStore();
+
+	radi::RRect rect = store->GetExtent();
+
+	rf->Release();
+	folder->Release();
+	root->Release();
+}

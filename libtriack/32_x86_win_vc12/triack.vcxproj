@@ -68,8 +68,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\depends\riack\include;../include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\depends\riack\lib\debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\depends\riack\include;../include;..\depends\libxml2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\depends\riack\lib\debug;..\depends\libxml2\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)D</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -99,7 +99,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>riack.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>riack.lib;rpcrt4.lib;libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy $(OutDir)\$(TargetName).dll ..\..\bin

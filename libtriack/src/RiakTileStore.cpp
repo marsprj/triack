@@ -7,6 +7,9 @@
 #include <fstream>
 #include <sstream>
 
+#include <libxml/parser.h>
+#include <libxml/parserInternals.h>
+
 namespace radi
 {
 #define RADI_GEO_META_KEY "geo_meta.xml"
@@ -625,6 +628,59 @@ namespace radi
 	RRect RiakTileStore::GetExtent()
 	{
 		RRect rect;
+		memset(&rect, 0, sizeof(rect));
+
+		const char* cdi = GetConfCDI();
+
+		xmlParserCtxtPtr pxParseCtxt = NULL;
+		xmlKeepBlanksDefault(0);
+		xmlDoValidityCheckingDefaultValue = 0;
+		pxParseCtxt = xmlCreateMemoryParserCtxt((const char*)cdi, strlen(cdi));
+		if (pxParseCtxt == NULL)
+		{
+			return rect;
+		}
+
+		pxParseCtxt->linenumbers = 1;
+		xmlParseDocument(pxParseCtxt);
+
+		xmlDocPtr pxmlDoc = pxParseCtxt->myDoc;
+		if (pxmlDoc == NULL)
+		{
+			xmlFreeParserCtxt(pxParseCtxt);
+			return rect;
+		}
+		xmlNodePtr pxmlRoot = xmlDocGetRootElement(pxmlDoc);
+		if (pxmlDoc == NULL)
+		{
+			xmlFreeDoc(pxmlDoc);
+			xmlFreeParserCtxt(pxParseCtxt);
+			return rect;
+		}
+
+		for (xmlNode* child = pxmlRoot->children; child; child = child->next)
+		{
+			const char* nodeName = (const char*)child->name;
+			if (stricmp(nodeName, "XMin") == 0)
+			{
+				rect.xmin = atof((const char*)(child->children[0].content));
+			}
+			else if (stricmp(nodeName, "YMin") == 0)
+			{
+				rect.ymin = atof((const char*)(child->children[0].content));
+			}
+			else if (stricmp(nodeName, "XMax") == 0)
+			{
+				rect.xmax = atof((const char*)(child->children[0].content));
+			}
+			else if (stricmp(nodeName, "YMax") == 0)
+			{
+				rect.ymax = atof((const char*)(child->children[0].content));
+			}
+		}
+
+		xmlFreeDoc(pxmlDoc);
+		xmlFreeParserCtxt(pxParseCtxt);
 		return rect;
 	}
 
