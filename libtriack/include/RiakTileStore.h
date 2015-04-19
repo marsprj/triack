@@ -16,6 +16,14 @@ namespace radi
 		g_int64	volume;
 	}TileStoreInfo;
 
+	typedef struct
+	{
+		double xmin;
+		double ymin;
+		double xmax;
+		double ymax;
+	}RRect;
+
 	class TRIACK_API RiakTileStore
 	{
 	public:
@@ -28,6 +36,8 @@ namespace radi
 		const char*	GetStatus();
 
 		void		GetInfo(TileStoreInfo& info);
+		RRect		GetExtent();
+		bool		SetExtent(RRect rect);
 
 		RiakTile*	GetTile(const char* t_key);
 		bool		PutTile(const char* t_key, const unsigned char* t_data, size_t size, const char* content_type);

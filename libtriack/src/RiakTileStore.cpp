@@ -621,4 +621,24 @@ namespace radi
 
 		riack_free_string_linked_list_p(client, &list);
 	}
+
+	RRect RiakTileStore::GetExtent()
+	{
+		RRect rect;
+		return rect;
+	}
+
+	bool RiakTileStore::SetExtent(RRect rect)
+	{
+		std::stringstream ss;
+		ss << "<?xml  version=\"1.0\"  encoding=\"UTF-8\"?>";
+		ss << "<EnvelopeN  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"  xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.0\"  xsi:type=\"typens:EnvelopeN\">";
+		ss << "    <XMin>" << rect.xmin << "</XMin>";
+		ss << "    <YMin>" << rect.ymin << "< / YMin>";
+		ss << "    <XMax>" << rect.xmax << "< / XMax>";
+		ss << "    <YMax>" << rect.ymax << "< / YMax>";
+		ss << "</EnvelopeN>";
+		std::string meta = ss.str();
+		return PutTile(RADI_CONF_CDI_KEY, (unsigned char*)meta.c_str(), meta.length(), "text/plain");
+	}
 }
