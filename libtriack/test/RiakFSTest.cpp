@@ -116,19 +116,21 @@ void RiakFSTest::GetGeoMeta()
 	radi::RiakFile* root = m_riak.GetRoot();
 	CPPUNIT_ASSERT(root != NULL);
 
-	radi::RiakFile* rf = root->GetRiakFile("wgs84_vector_2to9_Layers");
+	radi::RiakFile* rdir = root->GetRiakFile("GF");
+
+	radi::RiakFile* rf = rdir->GetRiakFile("store9");
 	CPPUNIT_ASSERT(rf != NULL);
 
 	radi::RiakTileStore* store = rf->GetTileStore();
 	//获取tilestore的配置文件
 	const char* meta = store->GetGeoMeta();
-	printf(meta);
+	printf("%s\n",meta);
 
 	const char* xml = store->GetConfXML();
-	printf(xml);
+	printf("%s\n", xml);
 
 	const char* cdf = store->GetConfCDI();
-	printf(cdf);
+	printf("%s\n", cdf);
 
 	//store->Release();
 	rf->Release();
