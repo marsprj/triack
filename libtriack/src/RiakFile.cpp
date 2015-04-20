@@ -2,6 +2,7 @@
 #include "RiakFile.h"
 #include "RiakFileSet.h"
 #include "RiakTileStore.h"
+#include "RiakTileStorePGIS.h"
 
 namespace radi
 {
@@ -140,7 +141,14 @@ namespace radi
 		}
 		if (m_tile_store == NULL)
 		{
-			m_tile_store = new RiakTileStore(m_name.c_str(), m_key.c_str(), m_riak_fs);
+			if (strcmp(m_data_type.c_str(), "PGIS") == 0)
+			{	
+				m_tile_store = new RiakTileStorePGIS(m_name.c_str(), m_key.c_str(), m_riak_fs);
+			}
+			else
+			{
+				m_tile_store = new RiakTileStore(m_name.c_str(), m_key.c_str(), m_riak_fs);
+			}
 		}
 		return m_tile_store;
 	}
@@ -189,13 +197,6 @@ namespace radi
 		}
 
 		RiakFile* rfile = NULL;
-		//rfile = GetRiakFile(name);
-		//if (rfile)
-		//{
-		//	rfile->Release();
-		//	return NULL;
-		//}
-
 		if (!m_riak_fs->CreateRiakFile(m_key.c_str(), name, type))
 		{
 			return NULL;

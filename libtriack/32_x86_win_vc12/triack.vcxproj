@@ -176,6 +176,7 @@ copy $(OutDir)\$(TargetName).lib ..\..\lib</Command>
     <ClCompile Include="..\src\RiakFS.cpp" />
     <ClCompile Include="..\src\RiakTile.cpp" />
     <ClCompile Include="..\src\RiakTileStore.cpp" />
+    <ClCompile Include="..\src\RiakTileStorePGIS.cpp" />
     <ClCompile Include="..\src\RiakTileStoreSet.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -184,6 +185,7 @@ copy $(OutDir)\$(TargetName).lib ..\..\lib</Command>
     <ClInclude Include="..\include\RiakFS.h" />
     <ClInclude Include="..\include\RiakTile.h" />
     <ClInclude Include="..\include\RiakTileStore.h" />
+    <ClInclude Include="..\include\RiakTileStorePGIS.h" />
     <ClInclude Include="..\include\RiakTileStoreSet.h" />
     <ClInclude Include="..\include\triack.h" />
   </ItemGroup>

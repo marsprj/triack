@@ -33,6 +33,9 @@
     <ClCompile Include="..\src\RiakTileStoreSet.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RiakTileStorePGIS.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\RiakFS.h">
@@ -54,6 +57,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\RiakTileStoreSet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\RiakTileStorePGIS.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

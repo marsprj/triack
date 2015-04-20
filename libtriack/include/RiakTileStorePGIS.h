@@ -1,35 +1,16 @@
-#ifndef __TRIAK_FILE_STORE_H__
-#define __TRIAK_FILE_STORE_H__
+#ifndef __TRIAK_FILE_STORE_PGIS_H__
+#define __TRIAK_FILE_STORE_PGIS_H__
 
-#include "riack.h"
-#include "triack.h"
-#include <string>
+#include "RiakTileStore.h"
 
 namespace radi
 {
-	class RiakFS;
-	class RiakTile;
-
-	typedef struct
-	{
-		int		count;
-		g_int64	volume;
-	}TileStoreInfo;
-
-	typedef struct
-	{
-		double xmin;
-		double ymin;
-		double xmax;
-		double ymax;
-	}RRect;
-
-	class TRIACK_API RiakTileStore
+	class RiakTileStorePGIS : public RiakTileStore
 	{
 	public:
-		RiakTileStore();
-		RiakTileStore(const char* name, const char* key, RiakFS* riak_fs);
-		virtual ~RiakTileStore();
+		RiakTileStorePGIS();
+		RiakTileStorePGIS(const char* name, const char* key, RiakFS* riak_fs);
+		virtual ~RiakTileStorePGIS();
 	public:
 		const char*	GetKey();
 		const char*	GetName();
@@ -67,21 +48,12 @@ namespace radi
 		bool		PutStoreMeta();
 		bool		PutStoreMetaPGIS();
 		bool		PutStoreMetaPGIS(int start_level, int end_level, double xmin, double ymin, double xmax, double ymax);
-		
+
 		void		Release();
 
 		void		GetTiles();
 
-	protected:
-		std::string	m_name;
-		std::string	m_key;
-
-		std::string m_geo_meta;
-		std::string m_conf_xml;
-		std::string m_conf_cdi;
-
-		RiakFS 		*m_riak_fs;
 	};
 }
 
-#endif //__TRIAK_FILE_STORE_H__
+#endif //__TRIAK_FILE_STORE_PGIS_H__

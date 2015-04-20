@@ -10,6 +10,7 @@ namespace radi
 	class RiakFile;
 	class RiakFileSet;
 	class RiakTileStore;
+	class RiakTileStorePGIS;
 	class RiakTileStoreSet;
 
 	typedef enum 
@@ -21,6 +22,7 @@ namespace radi
 	{
 		friend class RiakFile;
 		friend class RiakTileStore;
+		friend class RiakTileStorePGIS;
 	public:
 		RiakFS();
 		RiakFS(const char* server, int port);

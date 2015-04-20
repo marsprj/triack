@@ -1,4 +1,4 @@
-#include "RiakTileStore.h"
+#include "RiakTileStorePGIS.h"
 #include "RiakFS.h"
 #include "RiakTile.h"
 #include <stdio.h>
@@ -16,7 +16,7 @@ namespace radi
 #define RADI_CONF_XML_KEY "Layers[conf.xml"
 #define RADI_CONF_CDI_KEY "Layers[conf.cdi"
 
-	char* tile_scales[] = { "1", "1",
+	char* pgis_scales[] = { "1", "1",
 		"393998400.6595608", "1.0000040861108481",
 		"196999200.3297804", "0.50000204305542406",
 		"98499600.1648902", "0.25000102152771203",
@@ -38,12 +38,12 @@ namespace radi
 		"1502.9846216446081", "3.8147128528703159e-006",
 		"751.49038700791209", "1.9073515436177414e-006" };
 
-	RiakTileStore::RiakTileStore()
+	RiakTileStorePGIS::RiakTileStorePGIS()
 	{
 		m_riak_fs = NULL;
 	}
 
-	RiakTileStore::RiakTileStore(const char* name, const char* key, RiakFS* riak_fs)
+	RiakTileStorePGIS::RiakTileStorePGIS(const char* name, const char* key, RiakFS* riak_fs)
 	{
 		if (name != NULL)
 		{
@@ -56,27 +56,27 @@ namespace radi
 		m_riak_fs = riak_fs;
 	}
 
-	RiakTileStore::~RiakTileStore()
+	RiakTileStorePGIS::~RiakTileStorePGIS()
 	{
 
 	}
 
-	void RiakTileStore::Release()
+	void RiakTileStorePGIS::Release()
 	{
 		delete this;
 	}
 
-	const char* RiakTileStore::GetName()
+	const char* RiakTileStorePGIS::GetName()
 	{
 		return m_name.c_str();
 	}
 
-	const char* RiakTileStore::GetKey()
+	const char* RiakTileStorePGIS::GetKey()
 	{
 		return m_key.c_str();
 	}
 
-	RiakTile* RiakTileStore::GetTile(const char* t_key)
+	RiakTile* RiakTileStorePGIS::GetTile(const char* t_key)
 	{
 		if (t_key == NULL)
 		{
@@ -110,7 +110,7 @@ namespace radi
 		return tile;
 	}
 
-	bool RiakTileStore::PutTile(const char* t_key, const unsigned char* t_data, size_t t_size, const char* content_type)
+	bool RiakTileStorePGIS::PutTile(const char* t_key, const unsigned char* t_data, size_t t_size, const char* content_type)
 	{
 		if (t_key == NULL || t_data == NULL || content_type == NULL)
 		{
@@ -118,7 +118,7 @@ namespace radi
 		}
 
 		riack_client* client = m_riak_fs->GetConnection();
-		
+
 		//riack_object *robj = NULL;
 		//robj = riack_object_alloc(client);
 		//robj->bucket.value = (char*)m_key.c_str();
@@ -154,10 +154,10 @@ namespace radi
 
 		riack_free_object_p(client, &robj);
 
-		return (ret==RIACK_SUCCESS);
+		return (ret == RIACK_SUCCESS);
 	}
 
-	bool RiakTileStore::PutTile(const char* t_key, const char* t_path)
+	bool RiakTileStorePGIS::PutTile(const char* t_key, const char* t_path)
 	{
 		if (t_key == NULL || t_path == NULL)
 		{
@@ -196,21 +196,21 @@ namespace radi
 		return ret;
 	}
 
-	bool RiakTileStore::PutTile(int level, int row, int col, const char* t_path)
+	bool RiakTileStorePGIS::PutTile(int level, int row, int col, const char* t_path)
 	{
 		char key[RADI_PATH_MAX];
 		sprintf(key, "%dx%dx%d", level, row, col);
 		return PutTile(key, t_path);
 	}
 
-	bool RiakTileStore::PutTile(int level, int row, int col, const unsigned char* t_data, size_t size, const char* content_type)
+	bool RiakTileStorePGIS::PutTile(int level, int row, int col, const unsigned char* t_data, size_t size, const char* content_type)
 	{
 		char key[RADI_PATH_MAX];
 		sprintf(key, "%dx%dx%d", level, row, col);
 		return PutTile(key, t_data, size, content_type);
 	}
 
-	void RiakTileStore::GetTiles()
+	void RiakTileStorePGIS::GetTiles()
 	{
 		riack_client* client = m_riak_fs->GetConnection();
 		if (!client)
@@ -242,7 +242,7 @@ namespace radi
 		riack_free_string_linked_list_p(client, &list);
 	}
 
-	const char* RiakTileStore::GetGeoMeta()
+	const char* RiakTileStorePGIS::GetGeoMeta()
 	{
 		const char* c_key = RADI_GEO_META_KEY;
 
@@ -272,7 +272,7 @@ namespace radi
 		return m_geo_meta.c_str();
 	}
 
-	const char* RiakTileStore::GetConfXML()
+	const char* RiakTileStorePGIS::GetConfXML()
 	{
 		const char* c_key = RADI_CONF_XML_KEY;
 
@@ -302,7 +302,7 @@ namespace radi
 		return m_conf_xml.c_str();
 	}
 
-	const char* RiakTileStore::GetConfCDI()
+	const char* RiakTileStorePGIS::GetConfCDI()
 	{
 		const char* c_key = RADI_CONF_CDI_KEY;
 
@@ -332,7 +332,7 @@ namespace radi
 		return m_conf_cdi.c_str();
 	}
 
-	bool RiakTileStore::PutGeoMeta(const char* data)
+	bool RiakTileStorePGIS::PutGeoMeta(const char* data)
 	{
 		if (!data)
 		{
@@ -342,7 +342,7 @@ namespace radi
 		return PutTile(RADI_GEO_META_KEY, (unsigned char*)data, strlen(data), "text/plain");
 	}
 
-	bool RiakTileStore::PutGeoMeta(int start_level, int end_level)
+	bool RiakTileStorePGIS::PutGeoMeta(int start_level, int end_level)
 	{
 		//char start[RADI_PATH_MAX];
 		//char end[RADI_PATH_MAX];
@@ -382,7 +382,7 @@ namespace radi
 		return PutTile(RADI_GEO_META_KEY, (unsigned char*)meta.c_str(), meta.length(), "text/plain");
 	}
 
-	bool RiakTileStore::PutConfXML(const char* data)
+	bool RiakTileStorePGIS::PutConfXML(const char* data)
 	{
 		if (!data)
 		{
@@ -392,7 +392,7 @@ namespace radi
 		return PutTile(RADI_CONF_XML_KEY, (unsigned char*)data, strlen(data), "text/plain");
 	}
 
-	bool RiakTileStore::PutConfCDI(const char* data)
+	bool RiakTileStorePGIS::PutConfCDI(const char* data)
 	{
 		if (!data)
 		{
@@ -402,7 +402,7 @@ namespace radi
 		return PutTile(RADI_CONF_CDI_KEY, (unsigned char*)data, strlen(data), "text/plain");
 	}
 
-	bool RiakTileStore::DeleteTile(const char* t_key)
+	bool RiakTileStorePGIS::DeleteTile(const char* t_key)
 	{
 		if (!t_key)
 		{
@@ -419,15 +419,10 @@ namespace radi
 
 		int ret = riack_delete(client, &bucket, &key, NULL);
 
-		return (ret==RIACK_SUCCESS);
+		return (ret == RIACK_SUCCESS);
 	}
 
-	bool RiakTileStore::PutStoreMeta()
-	{
-		return PutStoreMetaPGIS();
-	}
-
-	bool RiakTileStore::PutStoreMetaPGIS()
+	bool RiakTileStorePGIS::PutStoreMetaPGIS()
 	{
 		const char* cdi = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><EnvelopeN xsi:type='typens:EnvelopeN' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.0'><XMin>-198.00000610351563</XMin><YMin>-99.000006103515631</YMin><XMax>198.00012817382813</XMax><YMax>99.000128173828131</YMax></EnvelopeN>";
 		const char* xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><CacheInfo xsi:type='typens:CacheInfo' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.0'><TileCacheInfo xsi:type='typens:TileCacheInfo'><SpatialReference xsi:type='typens:GeographicCoordinateSystem'><WKT>GEOGCS[&quot;GCS_WGS_1984&quot;,DATUM[&quot;D_WGS_1984&quot;,SPHEROID[&quot;WGS_1984&quot;,6378137.0,298.257223563]],PRIMEM[&quot;Greenwich&quot;,0.0],UNIT[&quot;Degree&quot;,0.0174532925199433]]</WKT><XOrigin>-399.99999999999989</XOrigin><YOrigin>-399.99999999999989</YOrigin><XYScale>11258999068426.24</XYScale><ZOrigin>-100000</ZOrigin><ZScale>10000</ZScale><MOrigin>-100000</MOrigin><MScale>10000</MScale><XYTolerance>8.9831528411952133e-009</XYTolerance><ZTolerance>0.001</ZTolerance><MTolerance>0.001</MTolerance><HighPrecision>true</HighPrecision><LeftLongitude>-180</LeftLongitude><WKID>4326</WKID></SpatialReference><TileOrigin xsi:type='typens:PointN'><X>-256</X><Y>256</Y></TileOrigin><TileCols>256</TileCols><TileRows>256</TileRows><DPI>90</DPI><LODInfos xsi:type='typens:ArrayOfLODInfo'><LODInfo xsi:type='typens:LODInfo'><LevelID>0</LevelID><Scale>393998400.6595608</Scale><Resolution>1.0000040861108481</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>1</LevelID><Scale>196999200.3297804</Scale><Resolution>0.50000204305542406</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>2</LevelID><Scale>98499600.1648902</Scale><Resolution>0.25000102152771203</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>3</LevelID><Scale>49249800.0824451</Scale><Resolution>0.12500051076385602</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>4</LevelID><Scale>24624900.04122255</Scale><Resolution>0.062500255381928008</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>5</LevelID><Scale>12312450.020611275</Scale><Resolution>0.031250127690964004</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>6</LevelID><Scale>6156225.0103056375</Scale><Resolution>0.015625063845482002</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>7</LevelID><Scale>3078112.5051528187</Scale><Resolution>0.007812531922741001</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>8</LevelID><Scale>1539056.2525763882</Scale><Resolution>0.0039062659613704467</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>9</LevelID><Scale>769528.12628819409</Scale><Resolution>0.0019531329806852234</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>10</LevelID><Scale>384764.063144113</Scale><Resolution>0.00097656649034265201</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>11</LevelID><Scale>192382.0315720379</Scale><Resolution>0.00048828324517127884</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>12</LevelID><Scale>96191.015786038872</Scale><Resolution>0.00024414162258569</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>13</LevelID><Scale>48095.507893019436</Scale><Resolution>0.000122070811292845</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>14</LevelID><Scale>24047.753946509718</Scale><Resolution>6.10354056464225e-005</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>15</LevelID><Scale>12023.876973235261</Scale><Resolution>3.0517702823161505e-005</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>16</LevelID><Scale>6011.9384866176306</Scale><Resolution>1.5258851411580753e-005</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>17</LevelID><Scale>3005.9692433283726</Scale><Resolution>7.6294257058400141e-006</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>18</LevelID><Scale>1502.9846216446081</Scale><Resolution>3.8147128528703159e-006</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>19</LevelID><Scale>751.49038700791209</Scale><Resolution>1.9073515436177414e-006</Resolution></LODInfo></LODInfos></TileCacheInfo><TileImageInfo xsi:type='typens:TileImageInfo'><CacheTileFormat>PNG</CacheTileFormat><CompressionQuality>75</CompressionQuality><Antialiasing>false</Antialiasing></TileImageInfo><CacheStorageInfo xsi:type='typens:CacheStorageInfo'><StorageFormat>esriMapCacheStorageModeExploded</StorageFormat><PacketSize>0</PacketSize></CacheStorageInfo></CacheInfo>";
@@ -438,7 +433,7 @@ namespace radi
 		return true;
 	}
 
-	bool RiakTileStore::PutStoreMetaPGIS(int start_level, int end_level, double xmin, double ymin, double xmax, double ymax)
+	bool RiakTileStorePGIS::PutStoreMetaPGIS(int start_level, int end_level, double xmin, double ymin, double xmax, double ymax)
 	{
 		//const char* cdi = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><EnvelopeN xsi:type='typens:EnvelopeN' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.0'><XMin>-198.00000610351563</XMin><YMin>-99.000006103515631</YMin><XMax>198.00012817382813</XMax><YMax>99.000128173828131</YMax></EnvelopeN>";
 		//const char* xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><CacheInfo xsi:type='typens:CacheInfo' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.0'><TileCacheInfo xsi:type='typens:TileCacheInfo'><SpatialReference xsi:type='typens:GeographicCoordinateSystem'><WKT>GEOGCS[&quot;GCS_WGS_1984&quot;,DATUM[&quot;D_WGS_1984&quot;,SPHEROID[&quot;WGS_1984&quot;,6378137.0,298.257223563]],PRIMEM[&quot;Greenwich&quot;,0.0],UNIT[&quot;Degree&quot;,0.0174532925199433]]</WKT><XOrigin>-399.99999999999989</XOrigin><YOrigin>-399.99999999999989</YOrigin><XYScale>11258999068426.24</XYScale><ZOrigin>-100000</ZOrigin><ZScale>10000</ZScale><MOrigin>-100000</MOrigin><MScale>10000</MScale><XYTolerance>8.9831528411952133e-009</XYTolerance><ZTolerance>0.001</ZTolerance><MTolerance>0.001</MTolerance><HighPrecision>true</HighPrecision><LeftLongitude>-180</LeftLongitude><WKID>4326</WKID></SpatialReference><TileOrigin xsi:type='typens:PointN'><X>-256</X><Y>256</Y></TileOrigin><TileCols>256</TileCols><TileRows>256</TileRows><DPI>90</DPI><LODInfos xsi:type='typens:ArrayOfLODInfo'><LODInfo xsi:type='typens:LODInfo'><LevelID>0</LevelID><Scale>393998400.6595608</Scale><Resolution>1.0000040861108481</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>1</LevelID><Scale>196999200.3297804</Scale><Resolution>0.50000204305542406</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>2</LevelID><Scale>98499600.1648902</Scale><Resolution>0.25000102152771203</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>3</LevelID><Scale>49249800.0824451</Scale><Resolution>0.12500051076385602</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>4</LevelID><Scale>24624900.04122255</Scale><Resolution>0.062500255381928008</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>5</LevelID><Scale>12312450.020611275</Scale><Resolution>0.031250127690964004</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>6</LevelID><Scale>6156225.0103056375</Scale><Resolution>0.015625063845482002</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>7</LevelID><Scale>3078112.5051528187</Scale><Resolution>0.007812531922741001</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>8</LevelID><Scale>1539056.2525763882</Scale><Resolution>0.0039062659613704467</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>9</LevelID><Scale>769528.12628819409</Scale><Resolution>0.0019531329806852234</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>10</LevelID><Scale>384764.063144113</Scale><Resolution>0.00097656649034265201</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>11</LevelID><Scale>192382.0315720379</Scale><Resolution>0.00048828324517127884</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>12</LevelID><Scale>96191.015786038872</Scale><Resolution>0.00024414162258569</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>13</LevelID><Scale>48095.507893019436</Scale><Resolution>0.000122070811292845</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>14</LevelID><Scale>24047.753946509718</Scale><Resolution>6.10354056464225e-005</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>15</LevelID><Scale>12023.876973235261</Scale><Resolution>3.0517702823161505e-005</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>16</LevelID><Scale>6011.9384866176306</Scale><Resolution>1.5258851411580753e-005</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>17</LevelID><Scale>3005.9692433283726</Scale><Resolution>7.6294257058400141e-006</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>18</LevelID><Scale>1502.9846216446081</Scale><Resolution>3.8147128528703159e-006</Resolution></LODInfo><LODInfo xsi:type='typens:LODInfo'><LevelID>19</LevelID><Scale>751.49038700791209</Scale><Resolution>1.9073515436177414e-006</Resolution></LODInfo></LODInfos></TileCacheInfo><TileImageInfo xsi:type='typens:TileImageInfo'><CacheTileFormat>PNG</CacheTileFormat><CompressionQuality>75</CompressionQuality><Antialiasing>false</Antialiasing></TileImageInfo><CacheStorageInfo xsi:type='typens:CacheStorageInfo'><StorageFormat>esriMapCacheStorageModeExploded</StorageFormat><PacketSize>0</PacketSize></CacheStorageInfo></CacheInfo>";
@@ -449,26 +444,11 @@ namespace radi
 		PutPutConfXMLPGIS(start_level, end_level);
 		//PutGeoMeta(meta);
 		PutGeoMeta(start_level, end_level);
-	
+
 		return true;
 	}
 
-	bool RiakTileStore::PutConfCDIPGIS(double xmin, double ymin, double xmax, double ymax)
-	{
-		std::stringstream ss;
-		ss << "<?xml  version=\"1.0\"  encoding=\"UTF-8\"?>";
-		ss << "<EnvelopeN  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"  xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.0\"  xsi:type=\"typens:EnvelopeN\">";
-		ss << "    <XMin>" << xmin <<"</XMin>";
-		ss << "    <YMin>" << ymin <<"</YMin>";
-		ss << "    <XMax>" << xmax << "</XMax>";
-		ss << "    <YMax>" << ymax << "</YMax>";
-		ss << "</EnvelopeN>";
-		std::string meta = ss.str();
-		printf(meta.c_str());
-		return PutTile(RADI_CONF_CDI_KEY, (unsigned char*)meta.c_str(), meta.length(), "text/plain");
-	}
-
-	bool RiakTileStore::UpdateConfCDI(double xmin, double ymin, double xmax, double ymax)
+	bool RiakTileStorePGIS::PutConfCDIPGIS(double xmin, double ymin, double xmax, double ymax)
 	{
 		std::stringstream ss;
 		ss << "<?xml  version=\"1.0\"  encoding=\"UTF-8\"?>";
@@ -482,7 +462,21 @@ namespace radi
 		return PutTile(RADI_CONF_CDI_KEY, (unsigned char*)meta.c_str(), meta.length(), "text/plain");
 	}
 
-	bool RiakTileStore::PutPutConfXMLPGIS(int start_level, int end_level)
+	bool RiakTileStorePGIS::UpdateConfCDI(double xmin, double ymin, double xmax, double ymax)
+	{
+		std::stringstream ss;
+		ss << "<?xml  version=\"1.0\"  encoding=\"UTF-8\"?>";
+		ss << "<EnvelopeN  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"  xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.0\"  xsi:type=\"typens:EnvelopeN\">";
+		ss << "    <XMin>" << xmin << "</XMin>";
+		ss << "    <YMin>" << ymin << "< / YMin>";
+		ss << "    <XMax>" << xmax << "< / XMax>";
+		ss << "    <YMax>" << ymax << "< / YMax>";
+		ss << "</EnvelopeN>";
+		std::string meta = ss.str();
+		return PutTile(RADI_CONF_CDI_KEY, (unsigned char*)meta.c_str(), meta.length(), "text/plain");
+	}
+
+	bool RiakTileStorePGIS::PutPutConfXMLPGIS(int start_level, int end_level)
 	{
 		char level[_MAX_PATH];
 		std::string meta = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><CacheInfo xsi:type='typens:CacheInfo' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.0'><TileCacheInfo xsi:type='typens:TileCacheInfo'><SpatialReference xsi:type='typens:GeographicCoordinateSystem'><WKT>GEOGCS[&quot;GCS_WGS_1984&quot;,DATUM[&quot;D_WGS_1984&quot;,SPHEROID[&quot;WGS_1984&quot;,6378137.0,298.257223563]],PRIMEM[&quot;Greenwich&quot;,0.0],UNIT[&quot;Degree&quot;,0.0174532925199433]]</WKT><XOrigin>-399.99999999999989</XOrigin><YOrigin>-399.99999999999989</YOrigin><XYScale>11258999068426.24</XYScale><ZOrigin>-100000</ZOrigin><ZScale>10000</ZScale><MOrigin>-100000</MOrigin><MScale>10000</MScale><XYTolerance>8.9831528411952133e-009</XYTolerance><ZTolerance>0.001</ZTolerance><MTolerance>0.001</MTolerance><HighPrecision>true</HighPrecision><LeftLongitude>-180</LeftLongitude><WKID>4326</WKID></SpatialReference><TileOrigin xsi:type='typens:PointN'><X>-256</X><Y>256</Y></TileOrigin><TileCols>256</TileCols><TileRows>256</TileRows><DPI>90</DPI><LODInfos xsi:type='typens:ArrayOfLODInfo'>";
@@ -498,11 +492,11 @@ namespace radi
 			meta.append("</LevelID>");
 
 			meta.append("<Scale>");
-			meta.append(tile_scales[2 * i]);
+			meta.append(pgis_scales[2 * i]);
 			meta.append("</Scale>");
 
 			meta.append("<Resolution>");
-			meta.append(tile_scales[2 * i + 1]);
+			meta.append(pgis_scales[2 * i + 1]);
 			meta.append("</Resolution>");
 
 			meta.append("</LODInfo>");
@@ -515,7 +509,7 @@ namespace radi
 		return true;
 	}
 
-	g_int64 RiakTileStore::GetVolume()
+	g_int64 RiakTileStorePGIS::GetVolume()
 	{
 		riack_client* client = m_riak_fs->GetConnection();
 		if (!client)
@@ -540,12 +534,12 @@ namespace radi
 
 			volume += GetVolume(key);
 		}
-		
+
 		riack_free_string_linked_list_p(client, &list);
 		return volume;
 	}
 
-	g_int64 RiakTileStore::GetVolume(const char* key)
+	g_int64 RiakTileStorePGIS::GetVolume(const char* key)
 	{
 		riack_get_object* robj = m_riak_fs->GetRiakObjects(m_key.c_str(), key);
 		if (!robj->object.content_count)
@@ -558,7 +552,7 @@ namespace radi
 		return volume;
 	}
 
-	bool RiakTileStore::UpdateVolume()
+	bool RiakTileStorePGIS::UpdateVolume()
 	{
 		riack_get_object* robj = m_riak_fs->GetRiakObjects(m_riak_fs->m_fs_name.c_str(), m_key.c_str());
 		if (!robj->object.content_count)
@@ -572,7 +566,7 @@ namespace radi
 		radi_riack_set_string(robj->object.bucket, m_riak_fs->m_fs_name.c_str());
 		radi_riack_set_string(robj->object.key, m_key.c_str());
 
-		riack_content& r_content = robj->object.content[0];	
+		riack_content& r_content = robj->object.content[0];
 		riack_pair* r_pair = &(r_content.usermetas[0]);
 		for (int i = 0; i < r_content.usermeta_count; i++, r_pair++)
 		{
@@ -594,11 +588,11 @@ namespace radi
 		riack_put(m_riak_fs->GetConnection(), &(robj->object), NULL, NULL);
 
 		riack_free_get_object_p(m_riak_fs->GetConnection(), &robj);
-		
+
 		return true;
 	}
 
-	void RiakTileStore::GetInfo(TileStoreInfo& info)
+	void RiakTileStorePGIS::GetInfo(TileStoreInfo& info)
 	{
 		riack_client* client = m_riak_fs->GetConnection();
 		if (!client)
@@ -631,7 +625,7 @@ namespace radi
 		riack_free_string_linked_list_p(client, &list);
 	}
 
-	RRect RiakTileStore::GetExtent()
+	RRect RiakTileStorePGIS::GetExtent()
 	{
 		RRect rect;
 		memset(&rect, 0, sizeof(rect));
@@ -690,7 +684,7 @@ namespace radi
 		return rect;
 	}
 
-	bool RiakTileStore::SetExtent(RRect rect)
+	bool RiakTileStorePGIS::SetExtent(RRect rect)
 	{
 		std::stringstream ss;
 		ss << "<?xml  version=\"1.0\"  encoding=\"UTF-8\"?>";

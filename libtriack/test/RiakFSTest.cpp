@@ -97,16 +97,16 @@ void RiakFSTest::CreateFolder()
 	root->Release();
 }
 
-//void RiakFSTest::CreateFile()
-//{
-//	radi::RiakFile* root = m_riak.GetRoot();
-//	radi::RiakFile* rdir = root->GetRiakFile("bbbb");
-//
-//	radi::RiakFile* rfile = rdir->CreateRiakFile("eeee");
-//	rfile->Release();
-//	rdir->Release();
-//	root->Release();
-//}
+void RiakFSTest::CreateRiakFile()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	//radi::RiakFile* rdir = root->GetRiakFile("ccc");
+
+	radi::RiakFile* rfile = root->CreateRiakFile("eeee", 3, 5, 0, 0, 180, 90);
+	rfile->Release();
+	//rdir->Release();
+	root->Release();
+}
 
 /*
  * RiakFS中的文件和目录都使用RiakFile类。对于文件类型的RiakFile，可以过去一个RiakTileStore对象，该对象管理tile。

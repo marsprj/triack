@@ -13,7 +13,7 @@ class RiakFSTest : public CppUnit::TestFixture
 	//CPPUNIT_TEST(GetTestKeys);
 
 	//CPPUNIT_TEST(CreateFolder);
-	//CPPUNIT_TEST(CreateFile);
+	CPPUNIT_TEST(CreateRiakFile);
 
 
 	//CPPUNIT_TEST(GetGeoMeta);
@@ -30,7 +30,7 @@ class RiakFSTest : public CppUnit::TestFixture
 
 	//CPPUNIT_TEST(PutGFTile);
 
-	CPPUNIT_TEST(GetExtent);
+	//CPPUNIT_TEST(GetExtent);
 
 	CPPUNIT_TEST_SUITE_END();
 public:
@@ -43,7 +43,7 @@ private:
 	void GetTestKeys();
 
 	void CreateFolder();
-	//void CreateFile();
+	void CreateRiakFile();
 
 	void GetGeoMeta();
 
