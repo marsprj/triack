@@ -118,7 +118,7 @@ void RiakFSTest::GetGeoMeta()
 
 	radi::RiakFile* rdir = root->GetRiakFile("GF");
 
-	radi::RiakFile* rf = rdir->GetRiakFile("store9");
+	radi::RiakFile* rf = rdir->GetRiakFile("store5");
 	CPPUNIT_ASSERT(rf != NULL);
 
 	radi::RiakTileStore* store = rf->GetTileStore();
