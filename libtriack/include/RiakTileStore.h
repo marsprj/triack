@@ -67,6 +67,10 @@ namespace radi
 		bool		PutStoreMeta();
 		bool		PutStoreMetaPGIS();
 		bool		PutStoreMetaPGIS(int start_level, int end_level, double xmin, double ymin, double xmax, double ymax);
+
+		bool		PutStoreMetaGoogle();
+		bool		PutStoreMetaGoogle(int start_level, int end_level, double xmin, double ymin, double xmax, double ymax);
+		bool		PutGeoMetaGoogle(int start_level, int end_level);
 		
 		void		Release();
 

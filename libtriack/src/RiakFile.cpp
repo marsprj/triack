@@ -206,7 +206,15 @@ namespace radi
 		RiakTileStore* store = rfile->GetTileStore();
 		if (store != NULL)
 		{
-			store->PutStoreMetaPGIS();
+			if (strcmp(type, "PGIS") == 0)
+			{
+				store->PutStoreMetaPGIS();
+			}
+			else
+			{
+				store->PutStoreMetaGoogle();
+			}
+			
 		}
 		return rfile;
 	}
@@ -233,7 +241,14 @@ namespace radi
 		RiakTileStore* store = rfile->GetTileStore();
 		if (store != NULL)
 		{
-			store->PutStoreMetaPGIS(start_level, end_level,xmin,ymin,xmax, ymax);
+			if (strcmp(type, "PGIS") == 0)
+			{
+				store->PutStoreMetaPGIS(start_level, end_level, xmin, ymin, xmax, ymax); 
+			}
+			else
+			{
+				store->PutStoreMetaGoogle(start_level, end_level, xmin, ymin, xmax, ymax); 
+			}
 		}
 		return rfile;
 	}

@@ -11,6 +11,8 @@
 #	define TRIACK_API
 #endif
 
+#include "riack.h"
+
 #ifdef WIN32
 #	define radi_stricmp		_stricmp
 #	define radi_strnicmp	_strnicmp
@@ -32,6 +34,9 @@ typedef long long	g_int64;
 #endif
 
 #define RADI_PATH_MAX		256
+
+#define RADI_DATA_TYPE_PGIS					"PGIS"
+#define RADI_DATA_TYPE_GOOGLE_CRS84_QUAD	"GOOGLE_CRS84_QUAD"
 
 namespace radi
 {

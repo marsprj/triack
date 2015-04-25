@@ -244,6 +244,16 @@ void CGImporterDlg::OnBnClickedBtnRiak()
 			}
 
 			m_cmb_riak_folder.SetCurSel(0);
+			
+			CString strFolder;
+			//m_cmb_riak_folder.GetWindowText(strFolder);
+			int item = m_cmb_riak_folder.GetCurSel();//(strFolder);
+			if(item<0)
+			{
+				return;
+			}
+			m_cmb_riak_folder.GetLBText(item, strFolder);
+			UpdateRiakStoreCombo(strFolder);
 
 			GetDlgItem(IDC_BTN_RIAK)->SetWindowText("¶Ï¿ª");
 
@@ -256,11 +266,7 @@ void CGImporterDlg::OnBnClickedBtnRiak()
 void CGImporterDlg::OnCbnSelchangeCmbRiakFolder()
 {
 	// TODO: Add your control notification handler code here
-	if(!m_riak)
-	{
-		return;
-	}
-
+	
 	CString strFolder;
 	//m_cmb_riak_folder.GetWindowText(strFolder);
 	int item = m_cmb_riak_folder.GetCurSel();//(strFolder);
@@ -269,6 +275,16 @@ void CGImporterDlg::OnCbnSelchangeCmbRiakFolder()
 		return;
 	}
 	m_cmb_riak_folder.GetLBText(item, strFolder);
+	UpdateRiakStoreCombo(strFolder);
+
+}
+
+void CGImporterDlg::UpdateRiakStoreCombo(CString strFolder)
+{
+	if(!m_riak)
+	{
+		return;
+	}
 	m_cmb_riak_store.ResetContent();
 	radi::RiakFile* root = m_riak->GetRoot();
 	radi::RiakFile* folder = root->GetRiakFile(strFolder);

@@ -47,6 +47,7 @@ public:
 	CComboBox m_cmb_tile_level;
 
 private:
+	void	UpdateRiakStoreCombo(CString strFolder);
 	radi::RiakFS* m_riak;
 public:
 	afx_msg void OnDestroy();
