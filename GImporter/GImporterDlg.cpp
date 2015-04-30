@@ -107,8 +107,8 @@ BOOL CGImporterDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	//GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("192.168.111.151");
-	//GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("123.57.207.198");
-	GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("192.168.111.104");
+	GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("123.57.207.198");
+	//GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("192.168.111.104");
 	GetDlgItem(IDC_RIAK_PORT)->SetWindowText("8087");
 
 	//m_cmb_riak_folder.AddString("google");
@@ -116,8 +116,8 @@ BOOL CGImporterDlg::OnInitDialog()
 	//m_cmb_riak_store.AddString("level_1");
 	//m_cmb_riak_store.SetCurSel(0);
 
-	GetDlgItem(IDC_TILE_FOLDER)->SetWindowText("E:\\Project\\Project\\GA\\Data\\world_png\\google");
-	GetDlgItem(IDC_TILE_FOLDER)->SetWindowText("E:\\Project\\Project\\GA\\Data\\world_png\\google");
+	//GetDlgItem(IDC_TILE_FOLDER)->SetWindowText("E:\\Project\\Project\\GA\\Data\\world_png\\google");
+	GetDlgItem(IDC_TILE_FOLDER)->SetWindowText("G:\\Data\\tar\\song\\world20150430103347");
 
 	GetDlgItem(IDC_STATIC_LOG)->SetWindowText("");
 

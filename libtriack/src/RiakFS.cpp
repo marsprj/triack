@@ -107,6 +107,8 @@ namespace radi
 
 		m_riak_allocator.alloc = radi_riack_alloc;
 		m_riak_allocator.free = radi_riack_free;
+
+		m_logger.Initialize();
 	}
 
 	RiakFS::RiakFS(const char* server, int port) :
@@ -120,6 +122,8 @@ namespace radi
 
 		m_riak_allocator.alloc = radi_riack_alloc;
 		m_riak_allocator.free = radi_riack_free;
+
+		m_logger.Initialize();
 	}
 
 	RiakFS::~RiakFS()

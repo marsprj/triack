@@ -3,6 +3,7 @@
 
 #include "riack.h"
 #include "triack.h"
+#include "RiakLogger.h"
 #include <string>
 
 namespace radi
@@ -73,6 +74,8 @@ namespace radi
 
 		std::string		m_fs_name;
 		std::string		m_fs_root;
+
+		RiakLogger		m_logger;
 
 	};
 

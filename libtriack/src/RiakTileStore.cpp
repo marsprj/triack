@@ -151,6 +151,12 @@ namespace radi
 		robj->content[0].data_len = t_size;
 
 		int ret = riack_put(client, robj, NULL, NULL);
+		if (ret != RIACK_SUCCESS)
+		{
+			char msg[RADI_PATH_MAX];
+			sprintf(msg, "Imporing [%s]:%s", t_key, client->last_error);
+			m_riak_fs->m_logger.Error(msg, __FILE__, __LINE__);
+		}
 
 		riack_free_object_p(client, &robj);
 
