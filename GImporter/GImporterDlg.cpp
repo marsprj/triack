@@ -6,6 +6,7 @@
 #include "GImporter.h"
 #include "GImporterDlg.h"
 #include "afxdialogex.h"
+#include <io.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -13,6 +14,106 @@
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
+
+void ImportLevel(CString strDir, CString strLevel);
+
+DWORD WINAPI ImportTiles(LPVOID lparam)
+{
+	CGImporterDlg* dlg = (CGImporterDlg*)lparam;
+
+	CString tile_folder = dlg->m_tile_folder;
+
+	char filter[_MAX_PATH];
+	_makepath(filter, NULL, tile_folder, "*", NULL);
+
+	WIN32_FIND_DATA fd; 
+	HANDLE hFind = ::FindFirstFile(filter, &fd);
+	TRACE0("\n");
+	if(hFind != INVALID_HANDLE_VALUE)
+	{
+		do
+		{	
+			if((fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY))
+			{
+				if(fd.cFileName[0]!='.')
+				{	
+					//CString strLevel = fd.cFileName;
+					//ImportLevel(m_tile_folder, strLevel);
+				}
+			}
+		}
+		while(::FindNextFile(hFind, &fd));
+		::FindClose(hFind);
+
+		AfxMessageBox("导入完毕");
+	}
+	return 0;
+}
+//
+//void ImportLevel(CString strDir, CString strLevel)
+//{
+//	CString strServer = m_riak_server;
+//	CString strPort = m_riak_port;
+//	CString strFolder = m_riak_folder;
+//	CString strStore = m_riak_store;
+//
+//	radi::RiakFS* riak = new radi::RiakFS(strServer, atoi(strPort));
+//	if(!riak->Connect())
+//	{
+//		riak->Release();
+//		return;
+//	}
+//
+//	radi::RiakFile* root = m_riak->GetRoot();
+//	radi::RiakFile* folder = root->GetRiakFile(strFolder);
+//	if(folder==NULL)
+//	{
+//		riak->Close();
+//		riak->Release();
+//		return;
+//	}
+//	radi::RiakFile* rfile = folder->GetRiakFile(strStore);
+//	if(rfile==NULL)
+//	{
+//		folder->Release();
+//		riak->Close();
+//		riak->Release();
+//		return;
+//	}
+//
+//	char store_path[_MAX_PATH];
+//	_makepath(store_path, NULL, strDir, strLevel, NULL);
+//
+//	char filter[_MAX_PATH];
+//	_makepath(filter, NULL, store_path, "*.png", NULL);
+//
+//	WIN32_FIND_DATA fd; 
+//	HANDLE hFind = ::FindFirstFile(filter, &fd);
+//	TRACE0("\n");
+//	if(hFind != INVALID_HANDLE_VALUE)
+//	{
+//		radi::RiakTileStore* store = rfile->GetTileStore();
+//		char tpath[_MAX_PATH];
+//		char tkey[_MAX_PATH];
+//
+//		int level=atoi(strLevel), row=0, col=0;
+//		do
+//		{	
+//			sscanf(fd.cFileName, "%ld_%ld.png", &row, &col);
+//			sprintf(tkey, "%dx%dx%d", level, row, col);
+//			//GetDlgItem(IDC_STATIC_LOG)->SetWindowText(tkey);
+//
+//			_makepath(tpath, NULL, store_path, fd.cFileName, NULL);
+//			if(!store->PutTile(tkey, tpath)) 
+//			{
+//				TRACE1("[%s]导入失败", tkey);
+//			}
+//		}
+//		while(::FindNextFile(hFind, &fd));
+//		::FindClose(hFind);
+//	}
+//}
+
 
 class CAboutDlg : public CDialogEx
 {
@@ -48,6 +149,11 @@ END_MESSAGE_MAP()
 
 CGImporterDlg::CGImporterDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CGImporterDlg::IDD, pParent)
+	, m_riak_server(_T(""))
+	, m_riak_port(_T(""))
+	, m_riak_folder(_T(""))
+	, m_riak_store(_T(""))
+	, m_tile_folder(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_riak = NULL;
@@ -59,6 +165,11 @@ void CGImporterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CMB_RIAK_FOLDER, m_cmb_riak_folder);
 	DDX_Control(pDX, IDC_CMB_RIAK_STORE, m_cmb_riak_store);
 	DDX_Control(pDX, IDC_CMB_TILE_LEVEL, m_cmb_tile_level);
+	DDX_Text(pDX, IDC_RIAK_SERVER, m_riak_server);
+	DDX_Text(pDX, IDC_RIAK_PORT, m_riak_port);
+	DDX_CBString(pDX, IDC_CMB_RIAK_FOLDER, m_riak_folder);
+	DDX_CBString(pDX, IDC_CMB_RIAK_STORE, m_riak_store);
+	DDX_Text(pDX, IDC_TILE_FOLDER, m_tile_folder);
 }
 
 BEGIN_MESSAGE_MAP(CGImporterDlg, CDialogEx)
@@ -106,8 +217,8 @@ BOOL CGImporterDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	//GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("192.168.111.151");
-	GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("123.57.207.198");
+	GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("192.168.111.151");
+	//GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("123.57.207.198");
 	//GetDlgItem(IDC_RIAK_SERVER)->SetWindowText("192.168.111.104");
 	GetDlgItem(IDC_RIAK_PORT)->SetWindowText("8087");
 
@@ -350,11 +461,177 @@ void CGImporterDlg::OnBnClickedBtnImport()
 		return;
 	}
 
-	CString strDir,strLevel,strRiakFolder, strStoreName;
-	GetDlgItem(IDC_TILE_FOLDER)->GetWindowText(strDir);
-	GetDlgItem(IDC_CMB_TILE_LEVEL)->GetWindowText(strLevel);
-	GetDlgItem(IDC_CMB_RIAK_FOLDER)->GetWindowText(strRiakFolder);
-	GetDlgItem(IDC_CMB_RIAK_STORE)->GetWindowText(strStoreName);
+	UpdateData(TRUE);
+
+	if(access(m_tile_folder,4))
+	{
+		AfxMessageBox("瓦片文件夹不存在");
+		return;
+	}
+
+	radi::RiakFile* root = m_riak->GetRoot();
+	radi::RiakFile* folder = root->GetRiakFile(m_riak_folder);
+	if(folder==NULL)
+	{
+		folder = root->CreateFolder(m_riak_folder);
+	}
+	if(folder==NULL)
+	{
+		AfxMessageBox("无法连接到创建folder文件夹");
+		return;
+	}
+	radi::RiakFile* rfile = folder->GetRiakFile(m_riak_store);
+	if(rfile==NULL)
+	{
+		rfile = folder->CreateRiakFile(m_riak_store, 1,18,-180,-90,180,90, RADI_DATA_TYPE_GOOGLE_CRS84_QUAD);
+	}
+	if(rfile==NULL)
+	{
+		AfxMessageBox("无法创建store");
+		folder->Release();
+		return;
+	}
+
+	char filter[_MAX_PATH];
+	_makepath(filter, NULL, m_tile_folder, "*", NULL);
+
+	WIN32_FIND_DATA fd; 
+	HANDLE hFind = ::FindFirstFile(filter, &fd);
+	TRACE0("\n");
+	if(hFind != INVALID_HANDLE_VALUE)
+	{
+		radi::RiakTileStore* store = rfile->GetTileStore();
+		char tpath[_MAX_PATH];
+		char tkey[_MAX_PATH];
+
+		do
+		{	
+			if((fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY))
+			{
+				if(fd.cFileName[0]!='.')
+				{	
+					CString strLevel = fd.cFileName;
+					ImportLevel(m_tile_folder, strLevel);
+				}
+			}
+		}
+		while(::FindNextFile(hFind, &fd));
+		::FindClose(hFind);
+
+		AfxMessageBox("导入完毕");
+	}
+	else
+	{
+		AfxMessageBox("文件路径不存在");
+	}	
+
+}
+
+//
+//void CGImporterDlg::OnBnClickedBtnImport()
+//{
+//	if(m_riak==NULL)
+//	{
+//		AfxMessageBox("尚未连接Riak");
+//		return;
+//	}
+//
+//	UpdateData(TRUE);
+//
+//	if(access(m_tile_folder,4))
+//	{
+//		AfxMessageBox("瓦片文件夹不存在");
+//		return;
+//	}
+//	
+//	radi::RiakFile* root = m_riak->GetRoot();
+//	radi::RiakFile* folder = root->GetRiakFile(m_riak_folder);
+//	if(folder==NULL)
+//	{
+//		folder = root->CreateFolder(m_riak_folder);
+//	}
+//	if(folder==NULL)
+//	{
+//		AfxMessageBox("无法连接到创建folder文件夹");
+//		return;
+//	}
+//	radi::RiakFile* rfile = folder->GetRiakFile(m_riak_store);
+//	if(rfile==NULL)
+//	{
+//		rfile = folder->CreateRiakFile(m_riak_store, 1,18,-180,-90,180,90, RADI_DATA_TYPE_GOOGLE_CRS84_QUAD);
+//	}
+//	if(rfile==NULL)
+//	{
+//		AfxMessageBox("无法创建store");
+//		folder->Release();
+//		return;
+//	}
+//
+//	char filter[_MAX_PATH];
+//	_makepath(filter, NULL, m_tile_folder, "*", NULL);
+//
+//	WIN32_FIND_DATA fd; 
+//	HANDLE hFind = ::FindFirstFile(filter, &fd);
+//	TRACE0("\n");
+//	if(hFind != INVALID_HANDLE_VALUE)
+//	{
+//		radi::RiakTileStore* store = rfile->GetTileStore();
+//		char tpath[_MAX_PATH];
+//		char tkey[_MAX_PATH];
+//
+//		do
+//		{	
+//			if((fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY))
+//			{
+//				if(fd.cFileName[0]!='.')
+//				{	
+//					CString strLevel = fd.cFileName;
+//					ImportLevel(m_tile_folder, strLevel);
+//				}
+//			}
+//		}
+//		while(::FindNextFile(hFind, &fd));
+//		::FindClose(hFind);
+//
+//		AfxMessageBox("导入完毕");
+//	}
+//	else
+//	{
+//		AfxMessageBox("文件路径不存在");
+//	}	
+//
+//}
+
+void CGImporterDlg::ImportLevel(CString strDir, CString strLevel)
+{
+	CString strServer = m_riak_server;
+	CString strPort = m_riak_port;
+	CString strFolder = m_riak_folder;
+	CString strStore = m_riak_store;
+
+	radi::RiakFS* riak = new radi::RiakFS(strServer, atoi(strPort));
+	if(!riak->Connect())
+	{
+		riak->Release();
+		return;
+	}
+
+	radi::RiakFile* root = m_riak->GetRoot();
+	radi::RiakFile* folder = root->GetRiakFile(strFolder);
+	if(folder==NULL)
+	{
+		riak->Close();
+		riak->Release();
+		return;
+	}
+	radi::RiakFile* rfile = folder->GetRiakFile(strStore);
+	if(rfile==NULL)
+	{
+		folder->Release();
+		riak->Close();
+		riak->Release();
+		return;
+	}
 
 	char store_path[_MAX_PATH];
 	_makepath(store_path, NULL, strDir, strLevel, NULL);
@@ -367,29 +644,6 @@ void CGImporterDlg::OnBnClickedBtnImport()
 	TRACE0("\n");
 	if(hFind != INVALID_HANDLE_VALUE)
 	{
-		radi::RiakFile* root = m_riak->GetRoot();
-		radi::RiakFile* folder = root->GetRiakFile(strRiakFolder);
-		if(folder==NULL)
-		{
-			folder = root->CreateFolder(strRiakFolder);
-		}
-		if(folder==NULL)
-		{
-			AfxMessageBox("无法连接到创建folder文件夹");
-			return;
-		}
-		radi::RiakFile* rfile = folder->GetRiakFile(strStoreName);
-		if(rfile==NULL)
-		{
-			rfile = folder->CreateRiakFile(strStoreName, 1,18,-180,-90,180,90, RADI_DATA_TYPE_GOOGLE_CRS84_QUAD);
-		}
-		if(rfile==NULL)
-		{
-			AfxMessageBox("无法创建store");
-			folder->Release();
-			return;
-		}
-
 		radi::RiakTileStore* store = rfile->GetTileStore();
 		char tpath[_MAX_PATH];
 		char tkey[_MAX_PATH];
@@ -409,13 +663,7 @@ void CGImporterDlg::OnBnClickedBtnImport()
 		}
 		while(::FindNextFile(hFind, &fd));
 		::FindClose(hFind);
-		
-		AfxMessageBox("导入完毕");
 	}
-	else
-	{
-		AfxMessageBox("文件路径不存在");
-	}	
 }
 
 

@@ -54,4 +54,13 @@ public:
 	afx_msg void OnBnClickedBtnRiak();
 	afx_msg void OnCbnSelchangeCmbRiakFolder();
 	afx_msg void OnBnClickedOk();
+
+private:
+	void	ImportLevel(CString strDir, CString strLevel);
+public:
+	CString m_riak_server;
+	CString m_riak_port;
+	CString m_riak_folder;
+	CString m_riak_store;
+	CString m_tile_folder;
 };
