@@ -42,6 +42,8 @@ namespace radi
 		RiakFileSet*	ListFiles(const char* dir_key);
 		bool			HasFile(const char* parent_key, const char* name);
 
+		bool			RemoveRiakFileByName(const char* bucket, const char* name);
+
 		bool			CreateRiakFolder(const char* parent_key, const char* f_name);
 		bool			CreateRiakFile(const char* parent_key, const char* f_name, const char* type = "PGIS");
 

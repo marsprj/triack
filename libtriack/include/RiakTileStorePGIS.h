@@ -27,6 +27,7 @@ namespace radi
 		bool		PutTile(int level, int row, int col, const unsigned char* t_data, size_t size, const char* content_type);
 
 		bool		DeleteTile(const char* t_key);
+		bool		DeleteAllTiles();
 
 		g_int64		GetVolume();
 		g_int64		GetVolume(const char* key);

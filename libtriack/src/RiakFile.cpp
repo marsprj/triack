@@ -300,4 +300,102 @@ namespace radi
 
 		return true;
 	}
+
+	bool RiakFile::RemoveLink(const char* link_key)
+	{
+		if (link_key == NULL)
+		{
+			return false;
+		}
+
+		riack_client* client = m_riak_fs->GetConnection();
+		riack_get_object* robj = NULL;
+
+		robj = m_riak_fs->GetRiakObjects(m_riak_fs->m_fs_name.c_str(), m_key.c_str());
+		if (!robj->object.content_count)
+		{
+			riack_free_get_object_p(client, &robj);
+			return false;
+		}
+
+		robj->object.bucket.value = strdup(m_riak_fs->m_fs_name.c_str());
+		robj->object.bucket.len = m_riak_fs->m_fs_name.length();
+		robj->object.key.value = strdup(m_key.c_str());
+		robj->object.key.len = m_key.length();
+
+		char n_link_key[_MAX_PATH];
+		bool found = false;
+		riack_link* r_link = NULL;
+		riack_content& r_content = robj->object.content[0];
+		for (size_t i = 0; i < r_content.link_count; i++)
+		{
+			r_link = &(r_content.links[i]);
+			if (!found)
+			{
+				if (strncmp(link_key, r_link->key.value, r_link->key.len) == 0)
+				{
+					found = true;
+				}
+			}			
+			if (found)
+			{
+				if ((i+1) < r_content.link_count)
+				{
+					riack_link* n_link = &(r_content.links[i + 1]);
+					memcpy(n_link_key, n_link->key.value, n_link->key.len);
+					radi_riack_set_link(*r_link, m_riak_fs->m_fs_name.c_str(), n_link_key, "parent");
+				}
+			}
+
+		}
+
+		//riack_link* r_link = NULL;
+		//riack_content& r_content = robj->object.content[0];
+		//if (r_content.link_count > 0)
+		//{
+		//	r_link = r_content.links;
+		//	r_content.links = (riack_link*)realloc(r_link, (r_content.link_count + 1)*sizeof(riack_link));
+		//	r_link = r_content.links + r_content.link_count;
+		//	r_content.link_count += 1;
+		//}
+		//else
+		//{
+		//	r_content.link_count = 1;
+		//	r_link = (riack_link*)malloc(sizeof(riack_link));
+		//	r_content.links = r_link;
+		//}
+
+		//memset(r_link, 0, sizeof(r_link));
+		//radi_riack_set_link(*r_link, m_riak_fs->m_fs_name.c_str(), link_key, "parent");
+		if (found)
+		{
+			r_content.link_count -= 1;
+			riack_put(client, &(robj->object), NULL, NULL);
+		}
+		if (found)
+		{
+			r_content.link_count += 1;
+		}
+		riack_free_get_object_p(client, &robj);
+
+		return true;
+	}
+
+	bool RiakFile::RemoveRiakFile(const char* name)
+	{
+		RiakFile* rf = GetRiakFile(name);
+		if (rf == NULL)
+		{
+			return false;
+		}
+
+		const char* key = rf->GetKey();
+		RiakTileStore* store = rf->GetTileStore();
+		if (store != NULL)
+		{
+			store->DeleteAllTiles();
+		}
+
+		return RemoveLink(key);
+	}
 }

@@ -325,6 +325,56 @@ namespace radi
 		return rf;
 	}
 
+	bool RiakFS::RemoveRiakFileByName(const char* bucket, const char* name)
+	{
+		riack_get_object* robj = NULL;
+		robj = GetRiakObjects(m_fs_name.c_str(), bucket);
+		if (robj == NULL)
+		{
+			return false;
+		}
+
+		int n_content = robj->object.content_count;
+		if (!n_content)
+		{
+			riack_free_get_object_p(m_riak, &robj);
+			return false;
+		}
+
+		RiakFile* rf = NULL;
+		riack_content& r_content = robj->object.content[0];
+
+		char key[RADI_PATH_MAX];
+		int n_links = r_content.link_count;
+		for (int i = 0; i < n_links; i++)
+		{
+			riack_link& r_link = r_content.links[i];
+			if (!strncmp(r_link.tag.value, "parent", r_link.tag.len))
+			{
+				memset(key, 0, RADI_PATH_MAX);
+				memcpy(key, r_link.key.value, r_link.key.len);
+				rf = GetRiakFile(m_fs_name.c_str(), key);
+				if (rf != NULL)
+				{
+					//printf("%s\n", rf->GetName());
+					if (!strcmp(rf->GetName(), name))
+					{
+						break;
+					}
+					else
+					{
+						rf->Release();
+						rf = NULL;
+					}
+				}
+			}
+		}
+
+		riack_free_get_object_p(m_riak, &robj);
+		
+		return true;
+	}
+
 	riack_get_object* RiakFS::GetRiakObjects(const char* bucket, const char* key)
 	{
 		riack_string rbucket, rkey;

@@ -428,6 +428,35 @@ namespace radi
 		return (ret==RIACK_SUCCESS);
 	}
 
+	bool RiakTileStore::DeleteAllTiles()
+	{
+		riack_client* client = m_riak_fs->GetConnection();
+		if (!client)
+		{
+			return false;
+		}
+
+		riack_string_linked_list *list;
+		riack_string_linked_list *rkey;
+		riack_string bucket;
+		bucket.value = (char*)m_key.c_str();
+		bucket.len = m_key.length();
+
+		int ret = riack_list_keys(client, &bucket, &list);
+
+		char key[RADI_PATH_MAX];
+		for (rkey = list; rkey != NULL; rkey = rkey->next)
+		{
+			memset(key, 0, RADI_PATH_MAX);
+			memcpy(key, rkey->string.value, rkey->string.len);
+			DeleteTile(key);
+		}
+
+		riack_free_string_linked_list_p(client, &list);
+		return true;
+		return true;
+	}
+
 	bool RiakTileStore::PutStoreMeta()
 	{
 		return PutStoreMetaPGIS();

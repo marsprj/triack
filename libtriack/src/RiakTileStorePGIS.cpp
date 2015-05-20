@@ -422,6 +422,34 @@ namespace radi
 		return (ret == RIACK_SUCCESS);
 	}
 
+	bool RiakTileStorePGIS::DeleteAllTiles()
+	{
+		riack_client* client = m_riak_fs->GetConnection();
+		if (!client)
+		{
+			return false;
+		}
+
+		riack_string_linked_list *list;
+		riack_string_linked_list *rkey;
+		riack_string bucket;
+		bucket.value = (char*)m_key.c_str();
+		bucket.len = m_key.length();
+
+		int ret = riack_list_keys(client, &bucket, &list);
+		
+		char key[RADI_PATH_MAX];
+		for (rkey = list; rkey != NULL; rkey = rkey->next)
+		{
+			memset(key, 0, RADI_PATH_MAX);
+			memcpy(key, rkey->string.value, rkey->string.len);
+			DeleteTile(key);
+		}
+
+		riack_free_string_linked_list_p(client, &list);
+		return true;
+	}
+
 	bool RiakTileStorePGIS::PutStoreMetaPGIS()
 	{
 		const char* cdi = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><EnvelopeN xsi:type='typens:EnvelopeN' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.0'><XMin>-198.00000610351563</XMin><YMin>-99.000006103515631</YMin><XMax>198.00012817382813</XMax><YMax>99.000128173828131</YMax></EnvelopeN>";

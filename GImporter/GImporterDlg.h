@@ -38,6 +38,7 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg LRESULT OnUpdateLog(WPARAM wParam,LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnFolder();
@@ -55,6 +56,8 @@ public:
 	afx_msg void OnCbnSelchangeCmbRiakFolder();
 	afx_msg void OnBnClickedOk();
 
+	
+
 private:
 	void	ImportLevel(CString strDir, CString strLevel);
 public:
@@ -63,4 +66,8 @@ public:
 	CString m_riak_folder;
 	CString m_riak_store;
 	CString m_tile_folder;
+	CString m_tile_store;
+	CStatic m_static_log;
+
+	HANDLE	m_thread_handler;
 };

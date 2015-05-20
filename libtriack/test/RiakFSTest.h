@@ -15,7 +15,7 @@ class RiakFSTest : public CppUnit::TestFixture
 	//CPPUNIT_TEST(CreateFolder);
 	//CPPUNIT_TEST(CreateRiakFile);
 
-	CPPUNIT_TEST(GetGeoMeta);
+	//CPPUNIT_TEST(GetGeoMeta);
 
 	//CPPUNIT_TEST(PutTile);
 	//CPPUNIT_TEST(PutCDI);
@@ -30,6 +30,10 @@ class RiakFSTest : public CppUnit::TestFixture
 	//CPPUNIT_TEST(PutGFTile);
 
 	//CPPUNIT_TEST(GetExtent);
+
+	//CPPUNIT_TEST(GetTile);
+
+	CPPUNIT_TEST(RemoveRiakFile);
 
 	CPPUNIT_TEST_SUITE_END();
 public:
@@ -59,6 +63,10 @@ private:
 	void PutGFTile();
 
 	void GetExtent();
+
+	void GetTile();
+
+	void RemoveRiakFile();
 
 private:
 	radi::RiakFS m_riak;

@@ -278,3 +278,26 @@ void RiakFSTest::GetExtent()
 	folder->Release();
 	root->Release();
 }
+
+void RiakFSTest::GetTile()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	radi::RiakFile* folder = root->GetRiakFile("world2");
+	radi::RiakFile* rf = folder->GetRiakFile("store");
+
+	radi::RiakTileStore* store = rf->GetTileStore();
+
+	radi::RiakTile* pTile = store->GetTile("16x9635x39963");
+
+	rf->Release();
+	folder->Release();
+	root->Release();
+}
+
+void RiakFSTest::RemoveRiakFile()
+{
+	radi::RiakFile* root = m_riak.GetRoot();
+	radi::RiakFile* folder = root->GetRiakFile("world5");
+
+	folder->RemoveRiakFile("world5");
+}
